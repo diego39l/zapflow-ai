@@ -4,7 +4,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 
 import { Sidebar } from "@/components/shell/Sidebar";
-import { CLASSES_DE_COR, LogotipoDoProduto, SimboloDoProduto } from "@/components/branding/MarcaDoProduto";
+import {
+  CLASSES_DE_COR,
+  LogotipoDoProduto,
+  SimboloDoProduto,
+} from "@/components/branding/MarcaDoProduto";
 import type { ActiveOrg, AuthUser } from "@/lib/auth/types";
 import { DEFAULT_APP_NAME, marcaEhADoProduto, type Branding } from "@/lib/branding";
 import { MarcaDaInstalacaoProvider } from "@/lib/branding/contexto";
@@ -45,7 +49,7 @@ const org = {
 let contexto: { user: AuthUser; activeOrg: ActiveOrg | null } = { user: usuario, activeOrg: org };
 vi.mock("@/hooks/auth/AuthProvider", () => ({ useAuth: () => contexto }));
 
-const PADRAO: Branding = { name: DEFAULT_APP_NAME, logoUrl: null, initial: "D" };
+const PADRAO: Branding = { name: DEFAULT_APP_NAME, logoUrl: null, initial: "Z" };
 
 function renderSidebar(marca: Branding, collapsed: boolean) {
   return render(
@@ -91,7 +95,7 @@ describe("o desenho na barra lateral", () => {
   it("recolhida, mostra só o símbolo — e não a inicial em texto", () => {
     renderSidebar(PADRAO, true);
     expect(screen.getByRole("img", { name: DEFAULT_APP_NAME }).tagName.toLowerCase()).toBe("svg");
-    expect(screen.queryByText("D")).toBeNull();
+    expect(screen.queryByText("Z")).toBeNull();
   });
 
   it("com nome da instalação, segue em texto — o desenho do produto não vaza", () => {
@@ -117,8 +121,14 @@ describe("as cores do desenho", () => {
   it("as classes do componente cobrem exatamente a paleta declarada, nos dois temas", () => {
     // O Tailwind só gera utilitário para hex LITERAL no fonte, então o
     // componente repete os valores. Isto é o que impede os dois de divergirem.
-    const nasClasses = Object.values(CLASSES_DE_COR).join(" ").match(/#[0-9a-f]{6}/g) ?? [];
-    const naPaleta = [...Object.values(CORES_DA_MARCA.claro), ...Object.values(CORES_DA_MARCA.escuro)];
+    const nasClasses =
+      Object.values(CLASSES_DE_COR)
+        .join(" ")
+        .match(/#[0-9a-f]{6}/g) ?? [];
+    const naPaleta = [
+      ...Object.values(CORES_DA_MARCA.claro),
+      ...Object.values(CORES_DA_MARCA.escuro),
+    ];
     expect([...nasClasses].sort()).toEqual([...naPaleta].sort());
   });
 

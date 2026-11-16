@@ -477,7 +477,7 @@ sincronizar_smtp_do_gotrue() {
   set_env_var "$env_sb" SMTP_USER "$(valor_compose "$usuario")"
   set_env_var "$env_sb" SMTP_PASS "$(valor_compose "$senha")"
   set_env_var "$env_sb" SMTP_ADMIN_EMAIL "$(valor_compose "$remetente")"
-  set_env_var "$env_sb" SMTP_SENDER_NAME "$(valor_compose "${nome:-${APP_NAME:-DeskcommCRM}}")"
+  set_env_var "$env_sb" SMTP_SENDER_NAME "$(valor_compose "${nome:-${APP_NAME:-ZapFlow AI}}")"
 }
 
 # A Resend também fala SMTP (smtp.resend.com:465, usuário `resend`, senha = a
@@ -2450,7 +2450,7 @@ ler_rodada_do_banco() {
 # `publish-image.yml` digam o mesmo. Se você é um fork, é lá que está a lista do
 # que trocar junto — e, desde 18/09/2026, o CI do SEU fork não cobra este valor:
 # a asserção só vale quando o dono do runner é o dono deste repositório.
-IMG_NS="ghcr.io/melgarafael"
+IMG_NS="ghcr.io/diego39l"
 IMG_APP="${IMG_NS}/deskcommcrm"
 IMG_WORKER="${IMG_NS}/deskcomm-worker"
 IMG_SCHEDULER="${IMG_NS}/deskcomm-scheduler"
@@ -2470,7 +2470,7 @@ IMG_VOICE_AGENT="${IMG_NS}/deskcomm-voice-agent"
 # alguém porque não deu para resolver um número de versão seria trocar um
 # problema de previsibilidade por um de disponibilidade.
 ultima_versao_publicada() {
-  local url="${1:-https://github.com/melgarafael/DeskcommCRM.git}" ref
+  local url="${1:-https://github.com/diego39l/zapflow-ai.git}" ref
   command -v git >/dev/null 2>&1 || return 0
   # `grep -v -- -` descarta PRERELEASE (v1.11.0-rc1, v1.1.1-jmpo.1 — esta última
   # existe de verdade neste repo). O `--sort=-v:refname` do git põe o prerelease
@@ -2498,7 +2498,7 @@ ultima_versao_publicada() {
 # passe 5 da triagem.
 #
 # E o literal escapava da catraca por acidente: `namespace-das-imagens.test.ts`
-# procura a string contígua `ghcr.io/melgarafael`, e a URL do token a parte em
+# procura a string contígua `ghcr.io/diego39l`, e a URL do token a parte em
 # `ghcr.io/token?scope=repository:melgarafael/`.
 ghcr_status() {
   local img="$1" tag="$2" tok registry owner

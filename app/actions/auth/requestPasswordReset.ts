@@ -1,6 +1,9 @@
 "use server";
 
 import { headers } from "next/headers";
+import { after } from "next/server";
+
+import { transporteRecuperacao, PRAZO_RECUPERACAO_MS } from "@/lib/auth/transporte-recuperacao";
 
 import { ipDoCliente } from "@/lib/http/ip-do-cliente";
 import { createClient } from "@/lib/supabase/server";
@@ -14,7 +17,15 @@ export type RequestPasswordResetResult =
   | { ok: true }
   | {
       ok: false;
-      error: "validation_error" | "rate_limited" | "smtp_not_configured" | "request_failed";
+      error:
+        | "validation_error"
+        | "rate_limited"
+        | "smtp_not_configured"
+        | "request_failed"
+        | "provider_timeout"
+        | "request_timeout"
+        | "invalid_response"
+        | "transport_error";
       details?: Record<string, unknown>;
     };
 
@@ -35,55 +46,58 @@ export async function requestPasswordReset(
     };
   }
 
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const prazo = new Promise<RequestPasswordResetResult>((resolve) => {
+    timer = setTimeout(() => {
+      controller.abort(new DOMException("Prazo da recuperação excedido", "TimeoutError"));
+      resolve({ ok: false, error: "request_timeout" });
+    }, PRAZO_RECUPERACAO_MS);
+  });
+  try {
+    return await Promise.race([enviarRecuperacao(parsed.data, controller.signal), prazo]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function enviarRecuperacao(input: ForgotPasswordInput, signal: AbortSignal): Promise<RequestPasswordResetResult> {
   const hdrs = await headers();
-  const origin = hdrs.get("origin") ?? env.NEXT_PUBLIC_APP_URL;
+  const callback = new URL("/auth/confirm?type=recovery", env.NEXT_PUBLIC_APP_URL);
   const requestId = hdrs.get("x-request-id");
   const ip = ipDoCliente(hdrs);
   const userAgent = hdrs.get("user-agent") ?? null;
 
-  // Sem teto, este endpoint é uma metralhadora de e-mail contra terceiros e um
-  // oráculo de enumeração de conta. Issue #64.
-  if (await authRateLimited("reset", parsed.data.email, AUTH_LIMITS.reset)) {
+  if (signal.aborted) return { ok: false, error: "request_timeout" };
+  if (await authRateLimited("reset", input.email, AUTH_LIMITS.reset)) {
     return { ok: false, error: "rate_limited" };
   }
-
-  // #2755 — decidido ANTES de chamar o GoTrue, sem olhar o que ele responde:
-  // assim a resposta depende só da instalação, nunca do e-mail digitado. A
-  // régua é compartilhada com quem AVISA (o painel de atualização), em
-  // `lib/email/estado.ts`.
+  if (signal.aborted) return { ok: false, error: "request_timeout" };
+  // A disponibilidade de SMTP depende somente da instalação, sem enumerar contas.
   if (await semSmtpNaInstalacao()) return { ok: false, error: "smtp_not_configured" };
+  if (signal.aborted) return { ok: false, error: "request_timeout" };
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    // ?type=recovery sobrevive ao redirect do GoTrue (preserva query string
-    // existente ao anexar `code=`/`token_hash=`) — sem SMTP customizado o
-    // Supabase usa o template padrão dele, que só devolve `code` (PKCE), sem
-    // `type`; /auth/confirm depende deste param pra saber que é recovery.
-    redirectTo: `${origin}/auth/confirm?type=recovery`,
+  const transporte = transporteRecuperacao(signal);
+  const supabase = await createClient(transporte.adaptarFetch);
+  if (signal.aborted) return { ok: false, error: "request_timeout" };
+
+  const { error } = await supabase.auth.resetPasswordForEmail(input.email, {
+    redirectTo: callback.href,
   });
+  if (signal.aborted) return { ok: false, error: "request_timeout" };
+  if (error?.status === 429) return { ok: false, error: "rate_limited" };
 
-  if (error) {
-    if (error.status === 429) return { ok: false, error: "rate_limited" };
-    await audit({
-      action: "auth.password_reset_request_failed",
-      metadata: {
-        email_hash: hashEmail(parsed.data.email),
-        reason: error.message,
-      },
+  const falha = transporte.falha() ??
+    (error?.status === 504 ? "provider_timeout" : error ? "request_failed" : null);
+  after(() =>
+    audit({
+      action: falha ? "auth.password_reset_request_failed" : "auth.password_reset_requested",
+      metadata: { email_hash: hashEmail(input.email), ...(falha ? { reason: falha } : {}) },
       requestId,
       ip,
       userAgent,
-    });
-    return { ok: false, error: "request_failed" };
-  }
+    }),
+  );
 
-  await audit({
-    action: "auth.password_reset_requested",
-    metadata: { email_hash: hashEmail(parsed.data.email) },
-    requestId,
-    ip,
-    userAgent,
-  });
-
-  return { ok: true };
+  return falha ? { ok: false, error: falha } : { ok: true };
 }

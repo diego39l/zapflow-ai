@@ -47,6 +47,13 @@ export function ForgotPasswordForm() {
             "A recuperação de senha não está disponível nesta instalação: sem SMTP configurado não sai e-mail nenhum. Contate o administrador para configurar em /admin/email.",
           ),
         );
+      } else if (
+        res.error === "provider_timeout" ||
+        res.error === "request_timeout" ||
+        res.error === "invalid_response" ||
+        res.error === "transport_error"
+      ) {
+        setServerError(t("Não foi possível confirmar o envio. Verifique a caixa de entrada e o spam antes de solicitar outro e-mail."));
       } else {
         setServerError(t("Não foi possível enviar o e-mail. Tente novamente."));
       }

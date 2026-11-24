@@ -10427,6 +10427,10 @@ export const DICIONARIO: Traducoes = {
   "Código de 6 dígitos": { es: "Código de 6 dígitos" },
   "Dígito": { es: "Dígito" },
   "Email inválido. Confira o campo.": { es: "Correo inválido. Revisa el campo." },
+  "Não foi possível confirmar o envio. Verifique a caixa de entrada e o spam antes de solicitar outro e-mail.": {
+    en: "We couldn't confirm delivery. Check your inbox and spam folder before requesting another email.",
+    es: "No pudimos confirmar el envío. Revisa tu bandeja de entrada y el correo no deseado antes de solicitar otro correo.",
+  },
   "Não foi possível enviar o e-mail. Tente novamente.": {
     es: "No se pudo enviar el correo. Intenta de nuevo.",
   },

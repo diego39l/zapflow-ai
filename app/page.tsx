@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { DestinoInicial } from "./destino-inicial";
 
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { idiomaDoVisitante } from "@/lib/i18n/idiomaAnonimo";
@@ -29,7 +29,7 @@ export default async function HomePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (user) redirect("/app");
+  if (user) return <DestinoInicial autenticado />;
 
   const marca = await marcaDaSaida(null);
   const idioma = await idiomaDoVisitante(null);
@@ -37,6 +37,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-muted/40">
+      <DestinoInicial autenticado={false} />
       <header className="border-b bg-background">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-6 py-4">
           <p className="text-sm font-semibold tracking-tight">{marca.nome}</p>

@@ -32,23 +32,9 @@ import { env } from "@/lib/env";
  *   signUp.ts anexam `?type=` no redirectTo/emailRedirectTo — é o único jeito
  *   desse dado sobreviver ao hop pelo GoTrue nesse formato.
  *
- *   ⚠️ O formato `code` NÃO FECHA nesta instalação, e o motivo é estrutural.
- *   `@supabase/ssr` força `flowType: "pkce"` (createServerClient.js:33) e grava
- *   o verificador num cookie (`<storageKey>-code-verifier`, cookies.js:18) com
- *   as MESMAS `cookieOptions` da sessão (cookies.js:227,232) — isto é, com o
- *   `sameSite: "strict"` de `lib/supabase/server.ts:35`. Clique de link vindo
- *   de webmail é navegação CROSS-SITE: o navegador não manda cookie Strict, o
- *   verificador não chega, e `exchangeCodeForSession` falha. O formato
- *   `token_hash` não depende de cookie nenhum.
- *
- *   (O que NÃO está medido: um cliente de e-mail nativo abre o link sem
- *   iniciador, e nesse caso o navegador PODE mandar o cookie Strict. Por isso a
- *   mensagem da tela aponta a configuração como conserto, e não promete que
- *   "abrir noutro lugar" funciona.)
- *
- *   É por isso que a recusa dos dois ramos não pode ter a mesma mensagem:
- *   "link inválido ou expirado" manda o operador caçar TTL e relógio quando o
- *   problema é que os templates nunca foram configurados.
+ *   Para recovery com `code`, o botão Continuar inicia um POST na própria
+ *   aplicação. Assim o cookie SameSite=Strict do verificador pode acompanhar
+ *   a troca, mesmo quando a primeira navegação veio de um webmail.
  *
  * - type=signup  → provisiona o tenant (org + membership admin) e entra no
  *                  onboarding. Provisionamento é idempotente (link clicado 2x).
@@ -72,17 +58,16 @@ import { env } from "@/lib/env";
  * Por isso o GET com `token_hash` NÃO chama o provedor: leva a
  * `/login/continuar`, que mostra um botão. Quem gasta o token é o POST desse
  * botão — verificador automático segue link, não aperta botão de formulário.
- * O formato `code` segue no GET como antes, e esta proteção NÃO o alcança: no
- * template padrão o link do e-mail aponta para o `/auth/v1/verify` do GoTrue,
- * que gasta o OTP lá, antes de redirecionar para cá com o `code` — um
- * verificador que abra esse link gasta o OTP fora do nosso alcance (não
- * medido; é a leitura do caminho descrito no início deste comentário). O
- * conserto para esse formato é o mesmo de sempre: subir os templates
- * customizados (`hostgator-setup-kit/marca-emails.sh`), que trocam o link pelo
- * `token_hash` e caem na proteção acima.
+ * Para `code` de recovery, o botão também adia a troca PKCE até uma
+ * navegação da própria aplicação. O OTP do template padrão continua sendo
+ * verificado pelo GoTrue antes de chegar aqui.
  */
 export async function GET(request: NextRequest) {
   const url = request.nextUrl;
+  if (url.searchParams.has("error") || url.searchParams.has("error_code")) {
+    return NextResponse.redirect(new URL("/login?error=link_invalido", env.NEXT_PUBLIC_APP_URL));
+  }
+
   const tokenHash = url.searchParams.get("token_hash");
   const code = url.searchParams.get("code");
   const type = url.searchParams.get("type");
@@ -94,21 +79,34 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(continuar);
   }
 
+  if (code && type === "recovery") {
+    const continuar = new URL("/login/continuar", env.NEXT_PUBLIC_APP_URL);
+    continuar.searchParams.set("type", type);
+    continuar.searchParams.set("code", code);
+    return NextResponse.redirect(continuar);
+  }
+
   return confirmar({ tokenHash: null, code, type: type as EmailOtpType | null, request, status: 307 });
 }
 
-/** O botão "Continuar" de `/login/continuar` — o único caminho que gasta o `token_hash`. */
+/** Confirmação explícita do token_hash ou do código PKCE de recuperação. */
 export async function POST(request: NextRequest) {
   const form = await request.formData().catch(() => null);
   const campo = (nome: string) => {
     const valor = form?.get(nome);
     return typeof valor === "string" && valor.length > 0 ? valor : null;
   };
+  const tokenHash = campo("token_hash");
+  const type = campo("type");
+  const code = !tokenHash && type === "recovery" ? campo("code") : null;
+  if (code && request.headers.get("origin") !== new URL(env.NEXT_PUBLIC_APP_URL).origin) {
+    return NextResponse.redirect(new URL("/login?error=link_invalido", env.NEXT_PUBLIC_APP_URL), 303);
+  }
   // 303 e não 307: o 307 repetiria o POST no destino (`/login/reset`, `/app`…).
   return confirmar({
-    tokenHash: campo("token_hash"),
-    code: null,
-    type: campo("type") as EmailOtpType | null,
+    tokenHash,
+    code,
+    type: type as EmailOtpType | null,
     request,
     status: 303,
   });
@@ -158,9 +156,11 @@ async function confirmar({
   // Mandar essa pessoa para `/login?error=link_invalido` era, medido, o que
   // fazia dois convidados reais reentrarem pela senha e perderem o fio do
   // convite — terminando dentro do CRM sem organização e sem menu.
-  let usuario = data?.user ?? null;
+  const recovery = type === "recovery";
+  let usuario = error && recovery ? null : data?.user ?? null;
   let sessaoPreservada = false;
-  if (error || !usuario) {
+  // Recovery exige validação bem-sucedida, mesmo se já existir outra sessão.
+  if ((error || !usuario) && !recovery) {
     const { data: jaAutenticado } = await supabase.auth.getUser();
     if (jaAutenticado.user) {
       usuario = jaAutenticado.user;
@@ -181,7 +181,7 @@ async function confirmar({
     // continua sendo "peça outro link". `template_padrao` diz o que a tela
     // antes escondia: o link veio do modelo padrão, pedir outro não adianta, e
     // o conserto é configurar os templates (hostgator-setup-kit/marca-emails.sh).
-    return redirectTo(viaTokenHash ? "/login?error=link_invalido" : "/login?error=template_padrao");
+    return redirectTo(viaTokenHash || type === "recovery" ? "/login?error=link_invalido" : "/login?error=template_padrao");
   }
 
   if (sessaoPreservada) {

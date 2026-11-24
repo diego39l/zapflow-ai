@@ -1,8 +1,8 @@
 {
-  "name": "deskcomm-crm",
+  "name": "zapflow-ai",
   "version": "0.1.0",
   "private": true,
-  "description": "DeskcommCRM — sistema operacional de vendas open source com agentes de IA nativos e WhatsApp (WAHA). Self-hosted, multi-tenant, LGPD by-design.",
+  "description": "ZapFlow AI — sistema operacional de vendas open source com agentes de IA nativos e WhatsApp (WAHA). Self-hosted, multi-tenant, LGPD by-design.",
   "engines": {
     "node": ">=22"
   },
@@ -93,7 +93,7 @@
     "jsonc-parser": "^3.3.1",
     "lucide-react": "^1.61.0",
     "mysql2": "3.24.6",
-    "next": "^16.4.2",
+    "next": "^16.4.6",
     "next-themes": "^0.4.6",
     "nodemailer": "10.2.0",
     "pdfjs-dist": "^6.4.299",

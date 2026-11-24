@@ -3,12 +3,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const cena = vi.hoisted(() => ({
   usuario: null as { id: string } | null,
+  replace: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({
-  redirect: vi.fn((destino: string) => {
-    throw new Error(`NEXT_REDIRECT:${destino}`);
-  }),
+  useRouter: () => ({ replace: cena.replace }),
 }));
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({
@@ -26,6 +25,8 @@ async function montar() {
 
 beforeEach(() => {
   cena.usuario = null;
+  cena.replace.mockClear();
+  window.history.replaceState(null, "", "/");
 });
 
 describe("/ — a página inicial pública", () => {
@@ -56,6 +57,14 @@ describe("/ — a página inicial pública", () => {
 
   it("com sessão: segue direto para o painel, como sempre foi", async () => {
     cena.usuario = { id: "11111111-1111-4111-8111-111111111111" };
-    await expect(montar()).rejects.toThrow("NEXT_REDIRECT:/app");
+    await montar();
+    expect(cena.replace).toHaveBeenCalledExactlyOnceWith("/app");
   });
+  it.each([false, true])("OTP expirado leva ao aviso mesmo com sessão=%s", async (autenticado) => {
+    cena.usuario = autenticado ? { id: "fixture" } : null;
+    window.history.replaceState(null, "", "/#error=access_denied&error_code=otp_expired&next=https://externo.example.test");
+    await montar();
+    expect(cena.replace).toHaveBeenCalledExactlyOnceWith("/login?error=link_invalido");
+  });
+
 });

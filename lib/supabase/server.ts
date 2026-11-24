@@ -34,8 +34,14 @@ function opcoesDeCookie(sameSite: "strict" | "lax") {
   };
 }
 
-async function clienteDeServidor(sameSite: "strict" | "lax") {
+type AdaptarFetch = (fetchServidor: typeof fetch) => typeof fetch;
+
+async function clienteDeServidor(sameSite: "strict" | "lax", adaptarFetch?: AdaptarFetch) {
   const cookieStore = await cookies();
+  const fetchServidor = fetchDoServidor(
+    urlDoSupabaseNoServidor(env.SUPABASE_SERVER_URL, env.NEXT_PUBLIC_SUPABASE_URL),
+    env.NEXT_PUBLIC_SUPABASE_URL,
+  );
 
   return createServerClient(
     // #1082: a BASE fica na URL pública, porque é dela que o SDK monta os links
@@ -47,10 +53,7 @@ async function clienteDeServidor(sameSite: "strict" | "lax") {
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       global: {
-        fetch: fetchDoServidor(
-          urlDoSupabaseNoServidor(env.SUPABASE_SERVER_URL, env.NEXT_PUBLIC_SUPABASE_URL),
-          env.NEXT_PUBLIC_SUPABASE_URL,
-        ),
+        fetch: adaptarFetch?.(fetchServidor) ?? fetchServidor,
       },
       cookies: {
         getAll() {
@@ -72,8 +75,8 @@ async function clienteDeServidor(sameSite: "strict" | "lax") {
   );
 }
 
-export async function createClient() {
-  return clienteDeServidor("strict");
+export async function createClient(adaptarFetch?: AdaptarFetch) {
+  return clienteDeServidor("strict", adaptarFetch);
 }
 
 /**

@@ -17,14 +17,16 @@ export const generateMetadata = () => tituloDaTelaPublica((t) => t("Confirmar ac
  * na entrega e ficavam com o token de uso único antes da pessoa. Esta tela só
  * devolve o token num formulário; quem o gasta é o POST do botão, que nenhum
  * verificador aperta. Sem JavaScript de propósito: o botão funciona em qualquer
- * navegador, inclusive o embutido do app de e-mail.
+ * navegador. No recovery PKCE, o POST da própria aplicação usa o verificador
+ * guardado no navegador que pediu a recuperação.
  */
 export default async function ContinuarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ token_hash?: string; type?: string }>;
+  searchParams: Promise<{ token_hash?: string; code?: string; type?: string }>;
 }) {
-  const { token_hash: tokenHash, type } = await searchParams;
+  const { token_hash: tokenHash, code, type } = await searchParams;
+  const codigoRecovery = !tokenHash && type === "recovery" ? code : undefined;
   const supabase = await createClient();
   const {
     data: { user },
@@ -32,7 +34,7 @@ export default async function ContinuarPage({
   const idioma = await idiomaDoVisitante((user?.user_metadata?.locale as string | undefined) ?? null);
   const t = (texto: string) => traduzir(texto, idioma);
 
-  if (!tokenHash || !type) {
+  if ((!tokenHash && !codigoRecovery) || !type) {
     return (
       <div className="space-y-6 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">{t("Link inválido ou incompleto")}</h1>
@@ -53,7 +55,11 @@ export default async function ContinuarPage({
         </p>
       </div>
       <form method="post" action="/auth/confirm">
-        <input type="hidden" name="token_hash" value={tokenHash} />
+        {tokenHash ? (
+          <input type="hidden" name="token_hash" value={tokenHash} />
+        ) : (
+          <input type="hidden" name="code" value={codigoRecovery} />
+        )}
         <input type="hidden" name="type" value={type} />
         <Button type="submit" className="w-full">
           {t("Continuar")}

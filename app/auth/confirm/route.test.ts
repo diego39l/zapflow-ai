@@ -75,11 +75,11 @@ function requisicao(qs: string) {
 }
 
 /** O POST do botão "Continuar" da tela de confirmação — quem de fato gasta o token. */
-function envio(qs: string) {
+function envio(qs: string, origin = "http://localhost:3000") {
   return new NextRequest("http://localhost:3000/auth/confirm", {
     method: "POST",
     body: new URLSearchParams(qs),
-    headers: { "content-type": "application/x-www-form-urlencoded" },
+    headers: { "content-type": "application/x-www-form-urlencoded", origin },
   });
 }
 
@@ -200,6 +200,62 @@ describe("GET /auth/confirm", () => {
 
     expect(destino(res)).toBe("/login?error=link_invalido");
     expect(vi.mocked(aplicarConvite)).not.toHaveBeenCalled();
+  });
+
+  it("recovery PKCE adia a troca no GET e usa o código no POST da origem canônica", async () => {
+    const supabase = stubSupabase({
+      verifyOtp: { data: { user: USUARIO }, error: null },
+      getUser: { data: { user: null } },
+    });
+    vi.mocked(createClient).mockResolvedValue(supabase as unknown as Awaited<ReturnType<typeof createClient>>);
+    const { GET, POST } = await import("./route");
+    const landing = await GET(requisicao("type=recovery&code=codigo-ficticio"));
+    expect(destino(landing)).toBe("/login/continuar?type=recovery&code=codigo-ficticio");
+    expect(createClient).not.toHaveBeenCalled();
+
+    const res = await POST(envio("type=recovery&code=codigo-ficticio"));
+    expect(supabase.auth.exchangeCodeForSession).toHaveBeenCalledExactlyOnceWith("codigo-ficticio");
+    expect(supabase.auth.verifyOtp).not.toHaveBeenCalled();
+    expect(res.status).toBe(303);
+    expect(destino(res)).toBe("/login/reset");
+  });
+
+  it("recusa POST de recovery PKCE de outra origem antes de chamar o provedor", async () => {
+    const { POST } = await import("./route");
+    const res = await POST(envio("type=recovery&code=codigo-ficticio", "https://externo.example.test"));
+    expect(destino(res)).toBe("/login?error=link_invalido");
+    expect(createClient).not.toHaveBeenCalled();
+  });
+
+  it("recovery PKCE sem verificador não reaproveita uma sessão autenticada", async () => {
+    const supabase = stubSupabase({
+      verifyOtp: { data: { user: null }, error: { message: "PKCE code verifier not found in storage" } },
+      getUser: { data: { user: USUARIO } },
+    });
+    vi.mocked(createClient).mockResolvedValue(supabase as unknown as Awaited<ReturnType<typeof createClient>>);
+    const { POST } = await import("./route");
+    const res = await POST(envio("type=recovery&code=codigo-ficticio"));
+    expect(destino(res)).toBe("/login?error=link_invalido");
+    expect(supabase.auth.getUser).not.toHaveBeenCalled();
+  });
+
+  it("recusa o erro explícito do Auth antes de tentar trocar um código", async () => {
+    const { GET } = await import("./route");
+    const res = await GET(requisicao("type=recovery&code=ficticio&error_code=otp_expired"));
+    expect(destino(res)).toBe("/login?error=link_invalido");
+    expect(createClient).not.toHaveBeenCalled();
+  });
+
+  it("OTP de recovery expirado não reutiliza uma sessão anterior", async () => {
+    const supabase = stubSupabase({
+      verifyOtp: { data: { user: null }, error: { message: "otp_expired" } },
+      getUser: { data: { user: USUARIO } },
+    });
+    vi.mocked(createClient).mockResolvedValue(supabase as unknown as Awaited<ReturnType<typeof createClient>>);
+    const { POST } = await import("./route");
+    const res = await POST(envio("type=recovery&token_hash=ficticio"));
+    expect(destino(res)).toBe("/login?error=link_invalido");
+    expect(supabase.auth.getUser).not.toHaveBeenCalled();
   });
 
   it("template padrão (formato code) sem sessão: mantém o diagnóstico próprio", async () => {

@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 import { createClient } from "@/lib/supabase/server";
 import { idiomaDoVisitante } from "@/lib/i18n/idiomaAnonimo";
@@ -11,9 +13,12 @@ export default async function ResetPasswordPage() {
   const supabase = await createClient();
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
+  if (error || !user) redirect("/login?error=link_invalido");
+
   const idioma = await idiomaDoVisitante(
-    (user?.user_metadata?.locale as string | undefined) ?? null,
+    (user.user_metadata?.locale as string | undefined) ?? null,
   );
   const t = (texto: string) => traduzir(texto, idioma);
 

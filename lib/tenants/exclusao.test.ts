@@ -343,6 +343,22 @@ describe("o banco recusou — nada lá fora caiu", () => {
     expect(audit).not.toHaveBeenCalled();
   });
 
+  it("PT409 por histórico financeiro tem código e mensagem próprios e não inicia a limpeza", async () => {
+    const admin = adminFalso({
+      status: "suspended",
+      rpcErro: { code: "PT409", message: "organizacao_com_historico_financeiro" },
+      removiveis: ["u1"],
+    });
+    await expect(excluirOrganizacao(admin as never, entrada)).rejects.toMatchObject({
+      name: "ExclusaoRecusada",
+      codigo: "exclusao_com_historico_financeiro",
+      message: "Esta organização possui histórico financeiro protegido e não pode ser excluída.",
+    });
+    expect(tocouTransporte()).toBe(false);
+    expect(passos.some((p) => p.startsWith("storage:") || p.startsWith("auth.delete"))).toBe(false);
+    expect(audit).not.toHaveBeenCalled();
+  });
+
   it("a resposta da rpc se perdeu (sem código): ExclusaoInterrompida — o commit pode ter acontecido, 'nada foi apagado' seria falso", async () => {
     const admin = adminFalso({
       status: "suspended",

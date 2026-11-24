@@ -101,6 +101,7 @@ export const ApiErrorCodes = {
   // recusa a exclusão (PT409 organizacao_com_assinatura_viva). Não é falta de
   // pagamento — é cobrança que seguiria correndo sem ninguém para cancelar.
   exclusao_com_assinatura_viva: "exclusao_com_assinatura_viva",
+  exclusao_com_historico_financeiro: "exclusao_com_historico_financeiro",
   // POST /admin/tenants/[id]/suspend|reactivate quando o descarte da fila bate
   // na trava do aviso do Meet (`appointment_notice_busy`, 40001): outra escrita
   // do mesmo contato está em curso. Nada foi gravado; tentar de novo resolve.

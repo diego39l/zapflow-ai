@@ -101,6 +101,7 @@ export class ExclusaoRecusada extends Error {
       | "state_conflict"
       | "exclusao_com_cobranca_pendente"
       | "exclusao_com_assinatura_viva"
+      | "exclusao_com_historico_financeiro"
       | "provedor_indisponivel"
       | "confirmacao_divergente"
       | "motivo_curto",
@@ -396,6 +397,11 @@ export async function excluirOrganizacao(
       throw new ExclusaoRecusada("exclusao_com_cobranca_pendente", MENSAGEM_DE_COBRANCA);
     if (rpcErr.code === "PT409" && rpcErr.message === "organizacao_com_assinatura_viva")
       throw new ExclusaoRecusada("exclusao_com_assinatura_viva", MENSAGEM_DE_ASSINATURA_VIVA);
+    if (rpcErr.code === "PT409" && rpcErr.message === "organizacao_com_historico_financeiro")
+      throw new ExclusaoRecusada(
+        "exclusao_com_historico_financeiro",
+        "Esta organização possui histórico financeiro protegido e não pode ser excluída.",
+      );
     if (rpcErr.code === "PT409")
       throw new ExclusaoRecusada("state_conflict", "A organização não está mais suspensa.");
     if (rpcErr.code === "PT404")

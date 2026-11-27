@@ -56,6 +56,7 @@ export async function GET(req: NextRequest): Promise<Response> {
     .select(
       "id, title, starts_at, contact_id, event_type_id, status, calendar_event_types(name, default_price_cents)",
     )
+    .eq("organization_id", authz.org.orgId)
     .in("status", ["confirmed", "completed"])
     .gte("starts_at", de)
     .lt("starts_at", agora.toISOString())
@@ -71,6 +72,7 @@ export async function GET(req: NextRequest): Promise<Response> {
   const { data: comandas } = await supabase
     .from("sales")
     .select("appointment_id")
+    .eq("organization_id", authz.org.orgId)
     .in("appointment_id", ids)
     .neq("status", "cancelled");
 

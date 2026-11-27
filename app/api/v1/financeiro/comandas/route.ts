@@ -52,6 +52,7 @@ export async function GET(req: NextRequest): Promise<Response> {
     .select(
       "id, number, status, contact_id, attendant_user_id, appointment_id, discount_cents, total_cents, currency, payment_method_id, notes, finalized_at, cancelled_at, reversed_at, created_at, sale_items(id, description, quantity, unit_price_cents, discount_cents, total_cents, commission_percent, attendant_user_id, event_type_id)",
     )
+    .eq("organization_id", authz.org.orgId)
     .order("number", { ascending: false })
     .limit(limite);
 

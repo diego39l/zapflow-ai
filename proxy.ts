@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookieSecure } from "@/lib/supabase/cookie-secure";
 import { NextResponse, type NextRequest } from "next/server";
 import { env } from "@/lib/env";
+import { FINANCIAL_DELETE_REQUEST_ID_HEADER } from "@/lib/api/wrappers";
 import { fetchDoServidor } from "@/lib/supabase/fetch-do-servidor";
 import { urlDoSupabaseNoServidor } from "@/lib/supabase/url-do-servidor";
 import { isPublicPath } from "@/lib/auth/public-paths";
@@ -24,14 +25,24 @@ export async function proxy(request: NextRequest) {
   );
   // O caminho atual, para os Server Components (o `next` do desafio de MFA em
   // `exigirProvaDeMfa`). Mesma regra: antes do `next`, e sempre gravado.
-  request.headers.set("x-pathname", request.nextUrl.pathname);
-  const response = NextResponse.next({ request: { headers: request.headers } });
+  const { pathname, search } = request.nextUrl;
+  request.headers.set("x-pathname", pathname);
 
-  // Inject X-Request-Id for downstream correlation (audit log, error wrappers).
-  const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();
+  const descarteFinanceiro =
+    request.method === "DELETE" && /^\/api\/v1\/financeiro\/lancamentos\/[^/]+\/?$/.test(pathname);
+  const requestId = descarteFinanceiro
+    ? crypto.randomUUID()
+    : (request.headers.get("x-request-id") ?? crypto.randomUUID());
+
+  // O valor recebido do cliente não cruza a fronteira deste cabeçalho.
+  request.headers.delete(FINANCIAL_DELETE_REQUEST_ID_HEADER);
+  if (descarteFinanceiro) {
+    request.headers.set(FINANCIAL_DELETE_REQUEST_ID_HEADER, requestId);
+    request.headers.set("x-request-id", requestId);
+  }
+  const response = NextResponse.next({ request: { headers: request.headers } });
   response.headers.set("x-request-id", requestId);
 
-  const { pathname, search } = request.nextUrl;
   // Recupera retornos de OAuth social já emitidos antes da landing pública existir.
   // Apenas a navegação é tratada: o vínculo de conta segue protegido pelos guards canônicos.
   // Passa adiante só o SINAL `connected=1` — nunca o `connect_token` nem o valor recebido.

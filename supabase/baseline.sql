@@ -4016,7 +4016,7 @@ ALTER TABLE "public"."ai_models" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'ai_models_read_all' AND polrelid = '"public"."ai_models"'::regclass) THEN
-CREATE POLICY "ai_models_read_all" ON "public"."ai_models" FOR SELECT USING (true);
+create policy "ai_models_read_all" on public.ai_models FOR SELECT USING (true);
 END IF; END $baseline_guard$;
 
 
@@ -4027,7 +4027,7 @@ ALTER TABLE "public"."ai_pricing" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'ai_pricing_public_read' AND polrelid = '"public"."ai_pricing"'::regclass) THEN
-CREATE POLICY "ai_pricing_public_read" ON "public"."ai_pricing" FOR SELECT USING (true);
+create policy "ai_pricing_public_read" on public.ai_pricing FOR SELECT USING (true);
 END IF; END $baseline_guard$;
 
 
@@ -4044,8 +4044,8 @@ ALTER TABLE "public"."api_tokens" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'api_tokens_tenant_read' AND polrelid = '"public"."api_tokens"'::regclass) THEN
-CREATE POLICY "api_tokens_tenant_read" ON "public"."api_tokens" FOR SELECT USING (("public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin"()));
-CREATE POLICY "api_tokens_admin_write" ON "public"."api_tokens" FOR ALL USING (("public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin_full"())) WITH CHECK (("public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin_full"()));
+create policy "api_tokens_tenant_read" on public.api_tokens FOR SELECT USING (("public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin"()));
+create policy "api_tokens_admin_write" on public.api_tokens FOR ALL USING (("public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin_full"())) WITH CHECK (("public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin_full"()));
 END IF; END $baseline_guard$;
 
 
@@ -4053,7 +4053,7 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'audit_log_insert_tenant_member' AND polrelid = '"public"."api_audit_log"'::regclass) THEN
-CREATE POLICY "audit_log_insert_tenant_member" ON "public"."api_audit_log" FOR INSERT TO "authenticated" WITH CHECK ((("organization_id" IS NULL) OR ("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"()));
+create policy "audit_log_insert_tenant_member" on public.api_audit_log FOR INSERT TO "authenticated" WITH CHECK ((("organization_id" IS NULL) OR ("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"()));
 END IF; END $baseline_guard$;
 
 
@@ -4061,7 +4061,7 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'audit_log_select' AND polrelid = '"public"."api_audit_log"'::regclass) THEN
-CREATE POLICY "audit_log_select" ON "public"."api_audit_log" FOR SELECT USING (("public"."fn_is_platform_admin"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'admin'::"text"))));
+create policy "audit_log_select" on public.api_audit_log FOR SELECT USING (("public"."fn_is_platform_admin"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'admin'::"text"))));
 END IF; END $baseline_guard$;
 
 
@@ -4099,7 +4099,7 @@ ALTER TABLE "public"."event_log" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'event_log_select' AND polrelid = '"public"."event_log"'::regclass) THEN
-CREATE POLICY "event_log_select" ON "public"."event_log" FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
+create policy "event_log_select" on public.event_log FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
 END IF; END $baseline_guard$;
 
 
@@ -4110,7 +4110,7 @@ ALTER TABLE "public"."idempotency_keys" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'idempotency_tenant' AND polrelid = '"public"."idempotency_keys"'::regclass) THEN
-CREATE POLICY "idempotency_tenant" ON "public"."idempotency_keys" USING (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids"))) WITH CHECK (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")));
+create policy "idempotency_tenant" on public.idempotency_keys USING (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids"))) WITH CHECK (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")));
 END IF; END $baseline_guard$;
 
 
@@ -4124,7 +4124,7 @@ ALTER TABLE "public"."lgpd_requests" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'lgpd_requests_admin_select' AND polrelid = '"public"."lgpd_requests"'::regclass) THEN
-CREATE POLICY "lgpd_requests_admin_select" ON "public"."lgpd_requests" FOR SELECT USING (("public"."fn_is_platform_admin"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'admin'::"text"))));
+create policy "lgpd_requests_admin_select" on public.lgpd_requests FOR SELECT USING (("public"."fn_is_platform_admin"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'admin'::"text"))));
 END IF; END $baseline_guard$;
 
 
@@ -4132,7 +4132,7 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'lgpd_requests_admin_write' AND polrelid = '"public"."lgpd_requests"'::regclass) THEN
-CREATE POLICY "lgpd_requests_admin_write" ON "public"."lgpd_requests" USING (("public"."fn_is_platform_admin_full"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'admin'::"text")))) WITH CHECK (("public"."fn_is_platform_admin_full"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'admin'::"text"))));
+create policy "lgpd_requests_admin_write" on public.lgpd_requests USING (("public"."fn_is_platform_admin_full"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'admin'::"text")))) WITH CHECK (("public"."fn_is_platform_admin_full"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'admin'::"text"))));
 END IF; END $baseline_guard$;
 
 
@@ -4143,7 +4143,7 @@ ALTER TABLE "public"."merge_queue" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'merge_queue_manager_select' AND polrelid = '"public"."merge_queue"'::regclass) THEN
-CREATE POLICY "merge_queue_manager_select" ON "public"."merge_queue" FOR SELECT USING (("public"."fn_is_platform_admin"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'manager'::"text"))));
+create policy "merge_queue_manager_select" on public.merge_queue FOR SELECT USING (("public"."fn_is_platform_admin"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'manager'::"text"))));
 END IF; END $baseline_guard$;
 
 
@@ -4151,7 +4151,7 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'merge_queue_manager_write' AND polrelid = '"public"."merge_queue"'::regclass) THEN
-CREATE POLICY "merge_queue_manager_write" ON "public"."merge_queue" USING (("public"."fn_is_platform_admin_full"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'manager'::"text")))) WITH CHECK (("public"."fn_is_platform_admin_full"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'manager'::"text"))));
+create policy "merge_queue_manager_write" on public.merge_queue USING (("public"."fn_is_platform_admin_full"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'manager'::"text")))) WITH CHECK (("public"."fn_is_platform_admin_full"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'manager'::"text"))));
 END IF; END $baseline_guard$;
 
 
@@ -4165,8 +4165,8 @@ ALTER TABLE "public"."nuvemshop_products" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'nuvemshop_products_read' AND polrelid = '"public"."nuvemshop_products"'::regclass) THEN
-CREATE POLICY "nuvemshop_products_read" ON "public"."nuvemshop_products" FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
-CREATE POLICY "nuvemshop_products_tenant_write" ON "public"."nuvemshop_products" FOR ALL USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"())) WITH CHECK ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"()));
+create policy "nuvemshop_products_read" on public.nuvemshop_products FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
+create policy "nuvemshop_products_tenant_write" on public.nuvemshop_products FOR ALL USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"())) WITH CHECK ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"()));
 END IF; END $baseline_guard$;
 
 
@@ -4177,7 +4177,7 @@ ALTER TABLE "public"."orders" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'orders_tenant_select' AND polrelid = '"public"."orders"'::regclass) THEN
-CREATE POLICY "orders_tenant_select" ON "public"."orders" FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
+create policy "orders_tenant_select" on public.orders FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
 END IF; END $baseline_guard$;
 
 
@@ -4185,7 +4185,7 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'orders_tenant_write' AND polrelid = '"public"."orders"'::regclass) THEN
-CREATE POLICY "orders_tenant_write" ON "public"."orders" USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"())) WITH CHECK ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"()));
+create policy "orders_tenant_write" on public.orders USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"())) WITH CHECK ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"()));
 END IF; END $baseline_guard$;
 
 
@@ -4196,7 +4196,7 @@ ALTER TABLE "public"."organizations" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'orgs_select' AND polrelid = '"public"."organizations"'::regclass) THEN
-CREATE POLICY "orgs_select" ON "public"."organizations" FOR SELECT USING ((("id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
+create policy "orgs_select" on public.organizations FOR SELECT USING ((("id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
 END IF; END $baseline_guard$;
 
 
@@ -4204,7 +4204,7 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'orgs_write_platform_admin' AND polrelid = '"public"."organizations"'::regclass) THEN
-CREATE POLICY "orgs_write_platform_admin" ON "public"."organizations" USING ("public"."fn_is_platform_admin_full"()) WITH CHECK ("public"."fn_is_platform_admin_full"());
+create policy "orgs_write_platform_admin" on public.organizations USING ("public"."fn_is_platform_admin_full"()) WITH CHECK ("public"."fn_is_platform_admin_full"());
 END IF; END $baseline_guard$;
 
 
@@ -4212,8 +4212,8 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'incidents_tenant_read' AND polrelid = '"public"."incidents"'::regclass) THEN
-CREATE POLICY "incidents_tenant_read" ON "public"."incidents" FOR SELECT USING ("public"."fn_is_platform_admin"());
-CREATE POLICY "incidents_admin_write" ON "public"."incidents" FOR ALL USING ("public"."fn_is_platform_admin_full"()) WITH CHECK ("public"."fn_is_platform_admin_full"());
+create policy "incidents_tenant_read" on public.incidents FOR SELECT USING ("public"."fn_is_platform_admin"());
+create policy "incidents_admin_write" on public.incidents FOR ALL USING ("public"."fn_is_platform_admin_full"()) WITH CHECK ("public"."fn_is_platform_admin_full"());
 END IF; END $baseline_guard$;
 
 
@@ -4224,7 +4224,7 @@ ALTER TABLE "public"."platform_admins" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'platform_admins_self' AND polrelid = '"public"."platform_admins"'::regclass) THEN
-CREATE POLICY "platform_admins_self" ON "public"."platform_admins" FOR SELECT USING ("public"."fn_is_platform_admin"());
+create policy "platform_admins_self" on public.platform_admins FOR SELECT USING ("public"."fn_is_platform_admin"());
 END IF; END $baseline_guard$;
 
 
@@ -4241,7 +4241,7 @@ ALTER TABLE "public"."tenant_integrations" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'tenant_integrations_admin_write' AND polrelid = '"public"."tenant_integrations"'::regclass) THEN
-CREATE POLICY "tenant_integrations_admin_write" ON "public"."tenant_integrations" USING (("public"."fn_is_platform_admin_full"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'manager'::"text")))) WITH CHECK (("public"."fn_is_platform_admin_full"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'manager'::"text"))));
+create policy "tenant_integrations_admin_write" on public.tenant_integrations USING (("public"."fn_is_platform_admin_full"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'manager'::"text")))) WITH CHECK (("public"."fn_is_platform_admin_full"() OR (("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) AND "public"."fn_role_at_least"("organization_id", 'manager'::"text"))));
 END IF; END $baseline_guard$;
 
 
@@ -4249,7 +4249,7 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'tenant_integrations_select' AND polrelid = '"public"."tenant_integrations"'::regclass) THEN
-CREATE POLICY "tenant_integrations_select" ON "public"."tenant_integrations" FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
+create policy "tenant_integrations_select" on public.tenant_integrations FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
 END IF; END $baseline_guard$;
 
 
@@ -4257,7 +4257,7 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'tenant_isolation_ai_agent_runs_all' AND polrelid = '"public"."ai_agent_runs"'::regclass) THEN
-CREATE POLICY "tenant_isolation_ai_agent_runs_all" ON "public"."ai_agent_runs" USING (("organization_id" IN ( SELECT "fn_user_org_ids"."fn_user_org_ids"
+create policy "tenant_isolation_ai_agent_runs_all" on public.ai_agent_runs USING (("organization_id" IN ( SELECT "fn_user_org_ids"."fn_user_org_ids"
    FROM "public"."fn_user_org_ids"() "fn_user_org_ids"("fn_user_org_ids")))) WITH CHECK (("organization_id" IN ( SELECT "fn_user_org_ids"."fn_user_org_ids"
    FROM "public"."fn_user_org_ids"() "fn_user_org_ids"("fn_user_org_ids"))));
 END IF; END $baseline_guard$;
@@ -4267,8 +4267,8 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'tenant_isolation_ai_invocations_read' AND polrelid = '"public"."ai_invocations"'::regclass) THEN
-CREATE POLICY "tenant_isolation_ai_invocations_read" ON "public"."ai_invocations" FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
-CREATE POLICY "tenant_isolation_ai_invocations_write" ON "public"."ai_invocations" FOR ALL USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"())) WITH CHECK ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"()));
+create policy "tenant_isolation_ai_invocations_read" on public.ai_invocations FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
+create policy "tenant_isolation_ai_invocations_write" on public.ai_invocations FOR ALL USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"())) WITH CHECK ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"()));
 END IF; END $baseline_guard$;
 
 
@@ -4276,7 +4276,7 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'tenant_isolation_ai_provider_credentials_select' AND polrelid = '"public"."ai_provider_credentials"'::regclass) THEN
-CREATE POLICY "tenant_isolation_ai_provider_credentials_select" ON "public"."ai_provider_credentials" FOR SELECT USING (("organization_id" IN ( SELECT "fn_user_org_ids"."fn_user_org_ids"
+create policy "tenant_isolation_ai_provider_credentials_select" on public.ai_provider_credentials FOR SELECT USING (("organization_id" IN ( SELECT "fn_user_org_ids"."fn_user_org_ids"
    FROM "public"."fn_user_org_ids"() "fn_user_org_ids"("fn_user_org_ids"))));
 END IF; END $baseline_guard$;
 
@@ -4285,8 +4285,8 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'tenant_isolation_contacts_read' AND polrelid = '"public"."contacts"'::regclass) THEN
-CREATE POLICY "tenant_isolation_contacts_read" ON "public"."contacts" FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
-CREATE POLICY "tenant_isolation_contacts_write" ON "public"."contacts" FOR ALL USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"())) WITH CHECK ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"()));
+create policy "tenant_isolation_contacts_read" on public.contacts FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
+create policy "tenant_isolation_contacts_write" on public.contacts FOR ALL USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"())) WITH CHECK ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"()));
 END IF; END $baseline_guard$;
 
 
@@ -4294,7 +4294,7 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'tenant_isolation_storage_redaction_queue_all' AND polrelid = '"public"."storage_redaction_queue"'::regclass) THEN
-CREATE POLICY "tenant_isolation_storage_redaction_queue_all" ON "public"."storage_redaction_queue" USING (("organization_id" IN ( SELECT "fn_user_org_ids"."fn_user_org_ids"
+create policy "tenant_isolation_storage_redaction_queue_all" on public.storage_redaction_queue USING (("organization_id" IN ( SELECT "fn_user_org_ids"."fn_user_org_ids"
    FROM "public"."fn_user_org_ids"() "fn_user_org_ids"("fn_user_org_ids")))) WITH CHECK (("organization_id" IN ( SELECT "fn_user_org_ids"."fn_user_org_ids"
    FROM "public"."fn_user_org_ids"() "fn_user_org_ids"("fn_user_org_ids"))));
 END IF; END $baseline_guard$;
@@ -4307,7 +4307,7 @@ ALTER TABLE "public"."user_organizations" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'user_orgs_delete' AND polrelid = '"public"."user_organizations"'::regclass) THEN
-CREATE POLICY "user_orgs_delete" ON "public"."user_organizations" FOR DELETE USING (("public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin_full"()));
+create policy "user_orgs_delete" on public.user_organizations FOR DELETE USING (("public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin_full"()));
 END IF; END $baseline_guard$;
 
 
@@ -4315,7 +4315,7 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'user_orgs_insert' AND polrelid = '"public"."user_organizations"'::regclass) THEN
-CREATE POLICY "user_orgs_insert" ON "public"."user_organizations" FOR INSERT WITH CHECK (("public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin_full"()));
+create policy "user_orgs_insert" on public.user_organizations FOR INSERT WITH CHECK (("public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin_full"()));
 END IF; END $baseline_guard$;
 
 
@@ -4323,7 +4323,7 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'user_orgs_select' AND polrelid = '"public"."user_organizations"'::regclass) THEN
-CREATE POLICY "user_orgs_select" ON "public"."user_organizations" FOR SELECT USING ((("user_id" = "auth"."uid"()) OR "public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin"()));
+create policy "user_orgs_select" on public.user_organizations FOR SELECT USING ((("user_id" = "auth"."uid"()) OR "public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin"()));
 END IF; END $baseline_guard$;
 
 
@@ -4331,7 +4331,7 @@ END IF; END $baseline_guard$;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'user_orgs_update' AND polrelid = '"public"."user_organizations"'::regclass) THEN
-CREATE POLICY "user_orgs_update" ON "public"."user_organizations" FOR UPDATE USING (("public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin_full"()));
+create policy "user_orgs_update" on public.user_organizations FOR UPDATE USING (("public"."fn_role_at_least"("organization_id", 'admin'::"text") OR "public"."fn_is_platform_admin_full"()));
 END IF; END $baseline_guard$;
 
 
@@ -4342,8 +4342,8 @@ ALTER TABLE "public"."user_recovery_codes" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'warmup_tenant_isolation_read' AND polrelid = '"public"."channel_session_warmup"'::regclass) THEN
-CREATE POLICY "warmup_tenant_isolation_read" ON "public"."channel_session_warmup" FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
-CREATE POLICY "warmup_tenant_isolation_write" ON "public"."channel_session_warmup" FOR ALL USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"())) WITH CHECK ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"()));
+create policy "warmup_tenant_isolation_read" on public.channel_session_warmup FOR SELECT USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin"()));
+create policy "warmup_tenant_isolation_write" on public.channel_session_warmup FOR ALL USING ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"())) WITH CHECK ((("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")) OR "public"."fn_is_platform_admin_full"()));
 END IF; END $baseline_guard$;
 
 
@@ -4354,7 +4354,7 @@ ALTER TABLE "public"."webhook_events_log" ENABLE ROW LEVEL SECURITY;
 DO $baseline_guard$ BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_policy
                 WHERE polname = 'webhook_events_log_tenant_read' AND polrelid = '"public"."webhook_events_log"'::regclass) THEN
-CREATE POLICY "webhook_events_log_tenant_read" ON "public"."webhook_events_log" FOR SELECT USING (("public"."fn_is_platform_admin"() OR (("organization_id" IS NOT NULL) AND ("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")))));
+create policy "webhook_events_log_tenant_read" on public.webhook_events_log FOR SELECT USING (("public"."fn_is_platform_admin"() OR (("organization_id" IS NOT NULL) AND ("organization_id" IN ( SELECT "public"."fn_user_org_ids"() AS "fn_user_org_ids")))));
 END IF; END $baseline_guard$;
 
 
@@ -5066,13 +5066,15 @@ drop policy if exists "tenant_isolation_crm_pipelines_all" on public.crm_pipelin
 drop policy if exists "crm_pipelines_select" on public.crm_pipelines;
 drop policy if exists "crm_pipelines_manager_write" on public.crm_pipelines;
 
-create policy "crm_pipelines_select" on public.crm_pipelines
+create policy "crm_pipelines_select"
+  on public.crm_pipelines
   for select using (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin()
   );
 
-create policy "crm_pipelines_manager_write" on public.crm_pipelines
+create policy "crm_pipelines_manager_write"
+  on public.crm_pipelines
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -5088,13 +5090,15 @@ drop policy if exists "tenant_isolation_crm_stages_all" on public.crm_stages;
 drop policy if exists "crm_stages_select" on public.crm_stages;
 drop policy if exists "crm_stages_manager_write" on public.crm_stages;
 
-create policy "crm_stages_select" on public.crm_stages
+create policy "crm_stages_select"
+  on public.crm_stages
   for select using (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin()
   );
 
-create policy "crm_stages_manager_write" on public.crm_stages
+create policy "crm_stages_manager_write"
+  on public.crm_stages
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -5439,13 +5443,15 @@ drop policy if exists "conversations_agent_insert" on public.conversations;
 drop policy if exists "conversations_agent_update" on public.conversations;
 drop policy if exists "conversations_agent_delete" on public.conversations;
 
-create policy "conversations_agent_insert" on public.conversations
+create policy "conversations_agent_insert"
+  on public.conversations
   for insert with check (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent'))
   );
-create policy "conversations_agent_update" on public.conversations
+create policy "conversations_agent_update"
+  on public.conversations
   for update using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -5455,7 +5461,8 @@ create policy "conversations_agent_update" on public.conversations
     or ((organization_id in (select public.fn_user_org_ids()))
         and public.fn_role_at_least(organization_id, 'agent'))
   );
-create policy "conversations_agent_delete" on public.conversations
+create policy "conversations_agent_delete"
+  on public.conversations
   for delete using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -5468,7 +5475,8 @@ drop policy if exists "messages_insert" on public.messages;
 drop policy if exists "messages_update" on public.messages;
 drop policy if exists "messages_delete" on public.messages;
 
-create policy "messages_select" on public.messages
+create policy "messages_select"
+  on public.messages
   for select using (
     public.fn_is_platform_admin()
     or exists (
@@ -5477,12 +5485,14 @@ create policy "messages_select" on public.messages
     )
   );
 
-create policy "messages_insert" on public.messages
+create policy "messages_insert"
+  on public.messages
   for insert with check (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin_full()
   );
-create policy "messages_update" on public.messages
+create policy "messages_update"
+  on public.messages
   for update using (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin_full()
@@ -5490,7 +5500,8 @@ create policy "messages_update" on public.messages
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin_full()
   );
-create policy "messages_delete" on public.messages
+create policy "messages_delete"
+  on public.messages
   for delete using (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin_full()
@@ -5618,12 +5629,14 @@ drop policy if exists "crm_leads_insert" on public.crm_leads;
 drop policy if exists "crm_leads_update" on public.crm_leads;
 drop policy if exists "crm_leads_delete" on public.crm_leads;
 
-create policy "crm_leads_select" on public.crm_leads
+create policy "crm_leads_select"
+  on public.crm_leads
   for select using (
     public.fn_can_view_lead(organization_id, owner_user_id)
   );
 
-create policy "crm_leads_insert" on public.crm_leads
+create policy "crm_leads_insert"
+  on public.crm_leads
   for insert with check (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -5631,7 +5644,8 @@ create policy "crm_leads_insert" on public.crm_leads
         and (public.fn_role_at_least(organization_id, 'manager')
              or public.fn_can_view_lead(organization_id, owner_user_id)))
   );
-create policy "crm_leads_update" on public.crm_leads
+create policy "crm_leads_update"
+  on public.crm_leads
   for update using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -5645,7 +5659,8 @@ create policy "crm_leads_update" on public.crm_leads
         and (public.fn_role_at_least(organization_id, 'manager')
              or public.fn_can_view_lead(organization_id, owner_user_id)))
   );
-create policy "crm_leads_delete" on public.crm_leads
+create policy "crm_leads_delete"
+  on public.crm_leads
   for delete using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -5841,13 +5856,15 @@ alter table public.automation_rule_runs enable row level security;
 drop policy if exists "webhook_sources_select" on public.webhook_sources;
 drop policy if exists "webhook_sources_manager_write" on public.webhook_sources;
 
-create policy "webhook_sources_select" on public.webhook_sources
+create policy "webhook_sources_select"
+  on public.webhook_sources
   for select using (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin()
   );
 
-create policy "webhook_sources_manager_write" on public.webhook_sources
+create policy "webhook_sources_manager_write"
+  on public.webhook_sources
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -5862,13 +5879,15 @@ create policy "webhook_sources_manager_write" on public.webhook_sources
 drop policy if exists "automation_rules_select" on public.automation_rules;
 drop policy if exists "automation_rules_manager_write" on public.automation_rules;
 
-create policy "automation_rules_select" on public.automation_rules
+create policy "automation_rules_select"
+  on public.automation_rules
   for select using (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin()
   );
 
-create policy "automation_rules_manager_write" on public.automation_rules
+create policy "automation_rules_manager_write"
+  on public.automation_rules
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -5882,7 +5901,8 @@ create policy "automation_rules_manager_write" on public.automation_rules
 
 drop policy if exists "automation_rule_runs_select" on public.automation_rule_runs;
 
-create policy "automation_rule_runs_select" on public.automation_rule_runs
+create policy "automation_rule_runs_select"
+  on public.automation_rule_runs
   for select using (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin()
@@ -5913,14 +5933,16 @@ create index if not exists idx_attendant_availability_available
 alter table public.attendant_availability enable row level security;
 
 drop policy if exists "attendant_availability_select" on public.attendant_availability;
-create policy "attendant_availability_select" on public.attendant_availability
+create policy "attendant_availability_select"
+  on public.attendant_availability
   for select using (
     public.fn_is_platform_admin()
     or organization_id in (select public.fn_user_org_ids())
   );
 
 drop policy if exists "attendant_availability_insert" on public.attendant_availability;
-create policy "attendant_availability_insert" on public.attendant_availability
+create policy "attendant_availability_insert"
+  on public.attendant_availability
   for insert with check (
     public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
@@ -5929,7 +5951,8 @@ create policy "attendant_availability_insert" on public.attendant_availability
   );
 
 drop policy if exists "attendant_availability_update" on public.attendant_availability;
-create policy "attendant_availability_update" on public.attendant_availability
+create policy "attendant_availability_update"
+  on public.attendant_availability
   for update using (
     public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
@@ -5943,7 +5966,8 @@ create policy "attendant_availability_update" on public.attendant_availability
   );
 
 drop policy if exists "attendant_availability_delete" on public.attendant_availability;
-create policy "attendant_availability_delete" on public.attendant_availability
+create policy "attendant_availability_delete"
+  on public.attendant_availability
   for delete using (
     public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
@@ -5977,14 +6001,16 @@ create index if not exists idx_attendant_availability_available
 alter table public.attendant_availability enable row level security;
 
 drop policy if exists "attendant_availability_select" on public.attendant_availability;
-create policy "attendant_availability_select" on public.attendant_availability
+create policy "attendant_availability_select"
+  on public.attendant_availability
   for select using (
     public.fn_is_platform_admin()
     or organization_id in (select public.fn_user_org_ids())
   );
 
 drop policy if exists "attendant_availability_insert" on public.attendant_availability;
-create policy "attendant_availability_insert" on public.attendant_availability
+create policy "attendant_availability_insert"
+  on public.attendant_availability
   for insert with check (
     public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
@@ -5993,7 +6019,8 @@ create policy "attendant_availability_insert" on public.attendant_availability
   );
 
 drop policy if exists "attendant_availability_update" on public.attendant_availability;
-create policy "attendant_availability_update" on public.attendant_availability
+create policy "attendant_availability_update"
+  on public.attendant_availability
   for update using (
     public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
@@ -6007,7 +6034,8 @@ create policy "attendant_availability_update" on public.attendant_availability
   );
 
 drop policy if exists "attendant_availability_delete" on public.attendant_availability;
-create policy "attendant_availability_delete" on public.attendant_availability
+create policy "attendant_availability_delete"
+  on public.attendant_availability
   for delete using (
     public.fn_is_platform_admin_full()
     or (organization_id in (select public.fn_user_org_ids())
@@ -6245,7 +6273,8 @@ drop policy if exists "tenant_isolation_crm_lead_activities_insert" on public.cr
 drop policy if exists "crm_lead_activities_select" on public.crm_lead_activities;
 drop policy if exists "crm_lead_activities_insert" on public.crm_lead_activities;
 
-create policy "crm_lead_activities_select" on public.crm_lead_activities
+create policy "crm_lead_activities_select"
+  on public.crm_lead_activities
   for select using (
     exists (
       select 1 from public.crm_leads l
@@ -6254,7 +6283,8 @@ create policy "crm_lead_activities_select" on public.crm_lead_activities
     )
   );
 
-create policy "crm_lead_activities_insert" on public.crm_lead_activities
+create policy "crm_lead_activities_insert"
+  on public.crm_lead_activities
   for insert with check (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin_full()
@@ -6266,7 +6296,8 @@ drop policy if exists "crm_lead_links_insert" on public.crm_lead_links;
 drop policy if exists "crm_lead_links_update" on public.crm_lead_links;
 drop policy if exists "crm_lead_links_delete" on public.crm_lead_links;
 
-create policy "crm_lead_links_select" on public.crm_lead_links
+create policy "crm_lead_links_select"
+  on public.crm_lead_links
   for select using (
     exists (
       select 1 from public.crm_leads l
@@ -6275,12 +6306,14 @@ create policy "crm_lead_links_select" on public.crm_lead_links
     )
   );
 
-create policy "crm_lead_links_insert" on public.crm_lead_links
+create policy "crm_lead_links_insert"
+  on public.crm_lead_links
   for insert with check (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin_full()
   );
-create policy "crm_lead_links_update" on public.crm_lead_links
+create policy "crm_lead_links_update"
+  on public.crm_lead_links
   for update using (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin_full()
@@ -6288,7 +6321,8 @@ create policy "crm_lead_links_update" on public.crm_lead_links
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin_full()
   );
-create policy "crm_lead_links_delete" on public.crm_lead_links
+create policy "crm_lead_links_delete"
+  on public.crm_lead_links
   for delete using (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin_full()
@@ -6301,7 +6335,8 @@ create policy "crm_lead_links_delete" on public.crm_lead_links
 -- e GET /api/v1/team devolvia 1 linha. Self-read preservado p/ todos; WRITE
 -- inalterado (insert/update/delete = admin). Idempotente e auto-curativo.
 drop policy if exists "user_orgs_select" on public.user_organizations;
-create policy "user_orgs_select" on public.user_organizations
+create policy "user_orgs_select"
+  on public.user_organizations
   for select using (
     (user_id = auth.uid())
     or public.fn_role_at_least(organization_id, 'manager')
@@ -8571,7 +8606,8 @@ comment on column public.crm_lead_scores.ai_probability_band is
 alter table public.crm_lead_scores enable row level security;
 
 drop policy if exists tenant_isolation_crm_lead_scores_all on public.crm_lead_scores;
-create policy tenant_isolation_crm_lead_scores_all on public.crm_lead_scores
+create policy tenant_isolation_crm_lead_scores_all
+  on public.crm_lead_scores
   for all
   using (organization_id in (select fn_user_org_ids()))
   with check (organization_id in (select fn_user_org_ids()));
@@ -8674,7 +8710,8 @@ alter table public.crm_lead_risk_states
 alter table public.crm_lead_risk_states enable row level security;
 
 drop policy if exists tenant_isolation_crm_lead_risk_states_all on public.crm_lead_risk_states;
-create policy tenant_isolation_crm_lead_risk_states_all on public.crm_lead_risk_states
+create policy tenant_isolation_crm_lead_risk_states_all
+  on public.crm_lead_risk_states
   for all
   using (organization_id in (select fn_user_org_ids()))
   with check (organization_id in (select fn_user_org_ids()));
@@ -8937,7 +8974,8 @@ create index if not exists idx_crm_lead_reactivations_vencendo
 alter table public.crm_lead_reactivations enable row level security;
 
 drop policy if exists tenant_isolation_crm_lead_reactivations_all on public.crm_lead_reactivations;
-create policy tenant_isolation_crm_lead_reactivations_all on public.crm_lead_reactivations
+create policy tenant_isolation_crm_lead_reactivations_all
+  on public.crm_lead_reactivations
   for all
   using (organization_id in (select fn_user_org_ids()))
   with check (organization_id in (select fn_user_org_ids()));
@@ -9203,7 +9241,8 @@ end $$;
 -- derruba a ampla delas; recriá-la aqui fazia cada update.sh (em autocommit)
 -- reabrir escrita a qualquer membro da organização até aquele drop.
 drop policy if exists tenant_isolation_ai_router_decisions_all on public.ai_router_decisions;
-create policy tenant_isolation_ai_router_decisions_all on public.ai_router_decisions for all
+create policy tenant_isolation_ai_router_decisions_all
+  on public.ai_router_decisions for all
   using (organization_id in (select * from public.fn_user_org_ids()))
   with check (organization_id in (select * from public.fn_user_org_ids()));
 
@@ -9563,7 +9602,8 @@ create index if not exists meta_templates_org_status_idx
 alter table public.meta_templates enable row level security;
 
 drop policy if exists tenant_isolation_meta_templates_all on public.meta_templates;
-create policy tenant_isolation_meta_templates_all on public.meta_templates
+create policy tenant_isolation_meta_templates_all
+  on public.meta_templates
   for all
   using (organization_id in (select public.fn_user_org_ids()))
   with check (organization_id in (select public.fn_user_org_ids()));
@@ -10544,13 +10584,15 @@ alter table public.demandas enable row level security;
 alter table public.demanda_conversas enable row level security;
 
 drop policy if exists tenant_isolation_demandas_all on public.demandas;
-create policy tenant_isolation_demandas_all on public.demandas
+create policy tenant_isolation_demandas_all
+  on public.demandas
   for all
   using (organization_id in (select * from public.fn_user_org_ids()))
   with check (organization_id in (select * from public.fn_user_org_ids()));
 
 drop policy if exists tenant_isolation_demanda_conversas_all on public.demanda_conversas;
-create policy tenant_isolation_demanda_conversas_all on public.demanda_conversas
+create policy tenant_isolation_demanda_conversas_all
+  on public.demanda_conversas
   for all
   using (organization_id in (select * from public.fn_user_org_ids()))
   with check (organization_id in (select * from public.fn_user_org_ids()));
@@ -11819,7 +11861,8 @@ create index if not exists idx_contact_field_proposals_vencendo
 alter table public.contact_field_proposals enable row level security;
 
 drop policy if exists tenant_isolation_contact_field_proposals_all on public.contact_field_proposals;
-create policy tenant_isolation_contact_field_proposals_all on public.contact_field_proposals
+create policy tenant_isolation_contact_field_proposals_all
+  on public.contact_field_proposals
   for all
   using (organization_id in (select public.fn_user_org_ids()))
   with check (organization_id in (select public.fn_user_org_ids()));
@@ -12042,13 +12085,15 @@ drop policy if exists tenant_isolation_org_guardrail_layers_all on public.org_gu
 drop policy if exists org_guardrail_layers_select on public.org_guardrail_layers;
 drop policy if exists org_guardrail_layers_admin_write on public.org_guardrail_layers;
 
-create policy org_guardrail_layers_select on public.org_guardrail_layers
+create policy org_guardrail_layers_select
+  on public.org_guardrail_layers
   for select using (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin()
   );
 
-create policy org_guardrail_layers_admin_write on public.org_guardrail_layers
+create policy org_guardrail_layers_admin_write
+  on public.org_guardrail_layers
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -12578,7 +12623,8 @@ notify pgrst, 'reload schema';
 drop policy if exists channel_sessions_tenant_isolation_all on public.channel_sessions;
 
 drop policy if exists channel_sessions_tenant_select on public.channel_sessions;
-create policy channel_sessions_tenant_select on public.channel_sessions
+create policy channel_sessions_tenant_select
+  on public.channel_sessions
   for select using (
     organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin()
   );
@@ -12593,13 +12639,15 @@ drop policy if exists channel_sessions_tenant_write on public.channel_sessions;
 drop policy if exists tenant_isolation_ai_agents_all on public.ai_agents;
 
 drop policy if exists tenant_isolation_ai_agents_select on public.ai_agents;
-create policy tenant_isolation_ai_agents_select on public.ai_agents
+create policy tenant_isolation_ai_agents_select
+  on public.ai_agents
   for select using (
     organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin()
   );
 
 drop policy if exists tenant_isolation_ai_agents_write on public.ai_agents;
-create policy tenant_isolation_ai_agents_write on public.ai_agents
+create policy tenant_isolation_ai_agents_write
+  on public.ai_agents
   for all using (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
@@ -12614,11 +12662,13 @@ create policy tenant_isolation_ai_agents_write on public.ai_agents
 drop policy if exists tenant_isolation_ai_agent_versions_all on public.ai_agent_versions;
 
 drop policy if exists tenant_isolation_ai_agent_versions_select on public.ai_agent_versions;
-create policy tenant_isolation_ai_agent_versions_select on public.ai_agent_versions
+create policy tenant_isolation_ai_agent_versions_select
+  on public.ai_agent_versions
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 drop policy if exists tenant_isolation_ai_agent_versions_write on public.ai_agent_versions;
-create policy tenant_isolation_ai_agent_versions_write on public.ai_agent_versions
+create policy tenant_isolation_ai_agent_versions_write
+  on public.ai_agent_versions
   for all using (
     organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin')
@@ -12631,13 +12681,15 @@ create policy tenant_isolation_ai_agent_versions_write on public.ai_agent_versio
 drop policy if exists tenant_isolation_ai_budgets_all on public.ai_budgets;
 
 drop policy if exists tenant_isolation_ai_budgets_select on public.ai_budgets;
-create policy tenant_isolation_ai_budgets_select on public.ai_budgets
+create policy tenant_isolation_ai_budgets_select
+  on public.ai_budgets
   for select using (
     organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin()
   );
 
 drop policy if exists tenant_isolation_ai_budgets_write on public.ai_budgets;
-create policy tenant_isolation_ai_budgets_write on public.ai_budgets
+create policy tenant_isolation_ai_budgets_write
+  on public.ai_budgets
   for all using (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
@@ -12652,11 +12704,13 @@ create policy tenant_isolation_ai_budgets_write on public.ai_budgets
 drop policy if exists tenant_isolation_ai_routers_all on public.ai_routers;
 
 drop policy if exists tenant_isolation_ai_routers_select on public.ai_routers;
-create policy tenant_isolation_ai_routers_select on public.ai_routers
+create policy tenant_isolation_ai_routers_select
+  on public.ai_routers
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 drop policy if exists tenant_isolation_ai_routers_write on public.ai_routers;
-create policy tenant_isolation_ai_routers_write on public.ai_routers
+create policy tenant_isolation_ai_routers_write
+  on public.ai_routers
   for all using (
     organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin')
@@ -12668,11 +12722,13 @@ create policy tenant_isolation_ai_routers_write on public.ai_routers
 drop policy if exists tenant_isolation_ai_router_members_all on public.ai_router_members;
 
 drop policy if exists tenant_isolation_ai_router_members_select on public.ai_router_members;
-create policy tenant_isolation_ai_router_members_select on public.ai_router_members
+create policy tenant_isolation_ai_router_members_select
+  on public.ai_router_members
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 drop policy if exists tenant_isolation_ai_router_members_write on public.ai_router_members;
-create policy tenant_isolation_ai_router_members_write on public.ai_router_members
+create policy tenant_isolation_ai_router_members_write
+  on public.ai_router_members
   for all using (
     organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin')
@@ -12684,11 +12740,13 @@ create policy tenant_isolation_ai_router_members_write on public.ai_router_membe
 drop policy if exists tenant_isolation_ai_purpose_bindings_all on public.ai_purpose_bindings;
 
 drop policy if exists tenant_isolation_ai_purpose_bindings_select on public.ai_purpose_bindings;
-create policy tenant_isolation_ai_purpose_bindings_select on public.ai_purpose_bindings
+create policy tenant_isolation_ai_purpose_bindings_select
+  on public.ai_purpose_bindings
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 drop policy if exists tenant_isolation_ai_purpose_bindings_write on public.ai_purpose_bindings;
-create policy tenant_isolation_ai_purpose_bindings_write on public.ai_purpose_bindings
+create policy tenant_isolation_ai_purpose_bindings_write
+  on public.ai_purpose_bindings
   for all using (
     organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin')
@@ -12714,7 +12772,8 @@ drop policy if exists tenant_isolation_ai_provider_credentials_select on public.
 drop policy if exists tenant_isolation_ai_provider_credentials_modify on public.ai_provider_credentials;
 
 drop policy if exists tenant_isolation_ai_provider_credentials_write on public.ai_provider_credentials;
-create policy tenant_isolation_ai_provider_credentials_write on public.ai_provider_credentials
+create policy tenant_isolation_ai_provider_credentials_write
+  on public.ai_provider_credentials
   for all using (
     organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin')
@@ -12762,7 +12821,8 @@ notify pgrst, 'reload schema';
 -- Este bloco vem DEPOIS do da 0150 de propósito: lá em cima há um
 -- `drop policy if exists ..._select`, e inverter a ordem apagaria este conserto.
 drop policy if exists tenant_isolation_ai_provider_credentials_select on public.ai_provider_credentials;
-create policy tenant_isolation_ai_provider_credentials_select on public.ai_provider_credentials
+create policy tenant_isolation_ai_provider_credentials_select
+  on public.ai_provider_credentials
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 notify pgrst, 'reload schema';
@@ -13710,7 +13770,8 @@ grant  execute on function public.fn_conversation_assign(uuid, uuid, uuid, text,
 -- `conversations`, então o escopo é HERDADO em vez de reescrito — duas cópias da
 -- mesma regra divergem na primeira mudança de uma delas.
 drop policy if exists cae_select on public.conversation_assignment_events;
-create policy cae_select on public.conversation_assignment_events
+create policy cae_select
+  on public.conversation_assignment_events
   for select using (
     public.fn_is_platform_admin()
     or (
@@ -15193,7 +15254,8 @@ create index if not exists push_subscriptions_org_idx
 alter table public.push_subscriptions enable row level security;
 
 drop policy if exists push_subscriptions_own on public.push_subscriptions;
-create policy push_subscriptions_own on public.push_subscriptions
+create policy push_subscriptions_own
+  on public.push_subscriptions
   for all
   using (
     organization_id in (select public.fn_user_org_ids())
@@ -15305,7 +15367,8 @@ comment on column public.webhook_lead_captures.source_name is
 alter table public.webhook_lead_captures enable row level security;
 
 drop policy if exists "webhook_lead_captures_manager_read" on public.webhook_lead_captures;
-create policy "webhook_lead_captures_manager_read" on public.webhook_lead_captures
+create policy "webhook_lead_captures_manager_read"
+  on public.webhook_lead_captures
   for select using (
     public.fn_is_platform_admin()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -15939,12 +16002,14 @@ $$;
 alter table public.calendar_event_types enable row level security;
 drop policy if exists tenant_isolation_calendar_event_types_all on public.calendar_event_types;
 drop policy if exists calendar_event_types_select on public.calendar_event_types;
-create policy calendar_event_types_select on public.calendar_event_types
+create policy calendar_event_types_select
+  on public.calendar_event_types
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or public.fn_is_platform_admin()
   );
 drop policy if exists calendar_event_types_write on public.calendar_event_types;
-create policy calendar_event_types_write on public.calendar_event_types
+create policy calendar_event_types_write
+  on public.calendar_event_types
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -15969,12 +16034,14 @@ revoke all on public.calendar_appointments from anon;
 alter table public.calendar_availability_exceptions enable row level security;
 drop policy if exists tenant_isolation_calendar_availability_exceptions_all on public.calendar_availability_exceptions;
 drop policy if exists calendar_availability_exceptions_select on public.calendar_availability_exceptions;
-create policy calendar_availability_exceptions_select on public.calendar_availability_exceptions
+create policy calendar_availability_exceptions_select
+  on public.calendar_availability_exceptions
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or public.fn_is_platform_admin()
   );
 drop policy if exists calendar_availability_exceptions_write on public.calendar_availability_exceptions;
-create policy calendar_availability_exceptions_write on public.calendar_availability_exceptions
+create policy calendar_availability_exceptions_write
+  on public.calendar_availability_exceptions
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -15991,7 +16058,8 @@ revoke all on public.calendar_availability_exceptions from anon;
 alter table public.calendar_connection_calendars enable row level security;
 drop policy if exists tenant_isolation_calendar_connection_calendars_all on public.calendar_connection_calendars;
 drop policy if exists calendar_connection_calendars_select on public.calendar_connection_calendars;
-create policy calendar_connection_calendars_select on public.calendar_connection_calendars
+create policy calendar_connection_calendars_select
+  on public.calendar_connection_calendars
   for select using (
     public.fn_is_platform_admin()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -16008,7 +16076,8 @@ revoke all on public.calendar_connection_calendars from anon;
 alter table public.calendar_external_events enable row level security;
 drop policy if exists tenant_isolation_calendar_external_events_all on public.calendar_external_events;
 drop policy if exists calendar_external_events_select on public.calendar_external_events;
-create policy calendar_external_events_select on public.calendar_external_events
+create policy calendar_external_events_select
+  on public.calendar_external_events
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or public.fn_is_platform_admin()
   );
@@ -16018,7 +16087,8 @@ alter table public.calendar_connections enable row level security;
 
 drop policy if exists tenant_isolation_calendar_connections_all on public.calendar_connections;
 drop policy if exists calendar_connections_dono_ou_manager_read on public.calendar_connections;
-create policy calendar_connections_dono_ou_manager_read on public.calendar_connections
+create policy calendar_connections_dono_ou_manager_read
+  on public.calendar_connections
   for select using (
     public.fn_is_platform_admin()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -17093,13 +17163,15 @@ on conflict (provider, model_id) do update set
 drop policy if exists tenant_isolation_ai_knowledge_sources_all on public.ai_knowledge_sources;
 
 drop policy if exists tenant_isolation_ai_knowledge_sources_select on public.ai_knowledge_sources;
-create policy tenant_isolation_ai_knowledge_sources_select on public.ai_knowledge_sources
+create policy tenant_isolation_ai_knowledge_sources_select
+  on public.ai_knowledge_sources
   for select using (
     organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin()
   );
 
 drop policy if exists tenant_isolation_ai_knowledge_sources_write on public.ai_knowledge_sources;
-create policy tenant_isolation_ai_knowledge_sources_write on public.ai_knowledge_sources
+create policy tenant_isolation_ai_knowledge_sources_write
+  on public.ai_knowledge_sources
   for all using (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'manager'))
@@ -17113,11 +17185,13 @@ create policy tenant_isolation_ai_knowledge_sources_write on public.ai_knowledge
 drop policy if exists tenant_isolation_ai_faq_items_all on public.ai_faq_items;
 
 drop policy if exists tenant_isolation_ai_faq_items_select on public.ai_faq_items;
-create policy tenant_isolation_ai_faq_items_select on public.ai_faq_items
+create policy tenant_isolation_ai_faq_items_select
+  on public.ai_faq_items
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 drop policy if exists tenant_isolation_ai_faq_items_write on public.ai_faq_items;
-create policy tenant_isolation_ai_faq_items_write on public.ai_faq_items
+create policy tenant_isolation_ai_faq_items_write
+  on public.ai_faq_items
   for all using (
     organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'manager')
@@ -17129,13 +17203,15 @@ create policy tenant_isolation_ai_faq_items_write on public.ai_faq_items
 drop policy if exists tenant_isolation_ai_kbv_all on public.ai_knowledge_versions;
 
 drop policy if exists tenant_isolation_ai_kbv_select on public.ai_knowledge_versions;
-create policy tenant_isolation_ai_kbv_select on public.ai_knowledge_versions
+create policy tenant_isolation_ai_kbv_select
+  on public.ai_knowledge_versions
   for select using (
     organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin()
   );
 
 drop policy if exists tenant_isolation_ai_kbv_write on public.ai_knowledge_versions;
-create policy tenant_isolation_ai_kbv_write on public.ai_knowledge_versions
+create policy tenant_isolation_ai_kbv_write
+  on public.ai_knowledge_versions
   for all using (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
@@ -17149,13 +17225,15 @@ create policy tenant_isolation_ai_kbv_write on public.ai_knowledge_versions
 drop policy if exists tenant_isolation_ai_chunks_all on public.ai_chunks;
 
 drop policy if exists tenant_isolation_ai_chunks_select on public.ai_chunks;
-create policy tenant_isolation_ai_chunks_select on public.ai_chunks
+create policy tenant_isolation_ai_chunks_select
+  on public.ai_chunks
   for select using (
     organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin()
   );
 
 drop policy if exists tenant_isolation_ai_chunks_write on public.ai_chunks;
-create policy tenant_isolation_ai_chunks_write on public.ai_chunks
+create policy tenant_isolation_ai_chunks_write
+  on public.ai_chunks
   for all using (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
@@ -17624,7 +17702,8 @@ alter table public.catalog_products enable row level security;
 -- produto, e a tela de Produtos estourava o statement_timeout de 8 s. Chamada que
 -- não depende da linha vai em `(select …)`: o planner a executa uma vez.
 drop policy if exists catalog_products_select on public.catalog_products;
-create policy catalog_products_select on public.catalog_products
+create policy catalog_products_select
+  on public.catalog_products
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or (select public.fn_is_platform_admin())
   );
@@ -17632,7 +17711,8 @@ create policy catalog_products_select on public.catalog_products
 drop policy if exists catalog_products_write on public.catalog_products;
 
 drop policy if exists catalog_products_insert on public.catalog_products;
-create policy catalog_products_insert on public.catalog_products
+create policy catalog_products_insert
+  on public.catalog_products
   for insert with check (
     (select public.fn_is_platform_admin_full())
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -17641,7 +17721,8 @@ create policy catalog_products_insert on public.catalog_products
 
 -- O nome `_write` fica com o UPDATE: é por ele que a 0533 e o invariante
 -- `platform-admin-full-so-escreve` conferem a expressão da escrita.
-create policy catalog_products_write on public.catalog_products
+create policy catalog_products_write
+  on public.catalog_products
   for update using (
     (select public.fn_is_platform_admin_full())
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -17654,7 +17735,8 @@ create policy catalog_products_write on public.catalog_products
   );
 
 drop policy if exists catalog_products_delete on public.catalog_products;
-create policy catalog_products_delete on public.catalog_products
+create policy catalog_products_delete
+  on public.catalog_products
   for delete using (
     (select public.fn_is_platform_admin_full())
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -18706,7 +18788,8 @@ grant execute on function public.fn_accept_team_invite(uuid, uuid, text, uuid, t
 -- Os namespaces LGPD/MCP continuam com o contrato de leitura/escrita original.
 alter table public.idempotency_keys add column if not exists tenant_creation_trusted boolean not null default false;
 drop policy if exists idempotency_platform_creation_server_only on public.idempotency_keys;
-create policy idempotency_platform_creation_server_only on public.idempotency_keys
+create policy idempotency_platform_creation_server_only
+  on public.idempotency_keys
   as restrictive for all to anon, authenticated
   using (endpoint not like '/api/v1/admin/tenants:%' and not tenant_creation_trusted)
   with check (endpoint not like '/api/v1/admin/tenants:%' and not tenant_creation_trusted);
@@ -22327,7 +22410,8 @@ revoke all on public.ai_reply_drafts from anon,authenticated;
 grant select on public.ai_reply_drafts to authenticated;
 grant all on public.ai_reply_drafts to service_role;
 drop policy if exists tenant_isolation_ai_reply_drafts_all on public.ai_reply_drafts;
-create policy tenant_isolation_ai_reply_drafts_all on public.ai_reply_drafts for select to authenticated
+create policy tenant_isolation_ai_reply_drafts_all
+  on public.ai_reply_drafts for select to authenticated
  using(organization_id in(select public.fn_user_org_ids()) and exists(select 1 from public.conversations c where c.organization_id=ai_reply_drafts.organization_id and c.id=conversation_id and public.fn_can_view_conversation(c.organization_id,c.assigned_to_user_id)));
 create index if not exists ai_reply_drafts_conversation on public.ai_reply_drafts(organization_id,conversation_id,created_at desc);
 
@@ -22927,10 +23011,12 @@ alter table public.channel_routing_responsibles enable row level security;
 revoke all on public.channel_routing_policies,public.channel_routing_responsibles from public,anon,authenticated,service_role;
 grant select on public.channel_routing_policies,public.channel_routing_responsibles to authenticated,service_role;
 drop policy if exists tenant_isolation_channel_routing_policies_select on public.channel_routing_policies;
-create policy tenant_isolation_channel_routing_policies_select on public.channel_routing_policies for select to authenticated
+create policy tenant_isolation_channel_routing_policies_select
+  on public.channel_routing_policies for select to authenticated
  using(organization_id in(select public.fn_user_org_ids()) or public.fn_is_platform_admin());
 drop policy if exists tenant_isolation_channel_routing_responsibles_select on public.channel_routing_responsibles;
-create policy tenant_isolation_channel_routing_responsibles_select on public.channel_routing_responsibles for select to authenticated
+create policy tenant_isolation_channel_routing_responsibles_select
+  on public.channel_routing_responsibles for select to authenticated
  using(organization_id in(select public.fn_user_org_ids()) or public.fn_is_platform_admin());
 
 -- Preserva história: apenas o evento pendente duplicado deixa de disputar consumo.
@@ -24067,7 +24153,8 @@ create unique index if not exists team_invites_um_pendente_por_email_idx
 alter table public.team_invites enable row level security;
 
 drop policy if exists team_invites_select on public.team_invites;
-create policy team_invites_select on public.team_invites
+create policy team_invites_select
+  on public.team_invites
   for select using (
     public.fn_is_platform_admin()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -24075,7 +24162,8 @@ create policy team_invites_select on public.team_invites
   );
 
 drop policy if exists team_invites_write on public.team_invites;
-create policy team_invites_write on public.team_invites
+create policy team_invites_write
+  on public.team_invites
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -24153,10 +24241,12 @@ drop policy if exists tenant_isolation_voice_calls_all on public.voice_calls;
 drop policy if exists voice_calls_select on public.voice_calls;
 drop policy if exists voice_calls_write on public.voice_calls;
 
-create policy voice_calls_select on public.voice_calls for select
+create policy voice_calls_select
+  on public.voice_calls for select
   using (organization_id in (select public.fn_user_org_ids()));
 
-create policy voice_calls_write on public.voice_calls for all
+create policy voice_calls_write
+  on public.voice_calls for all
   using (
     organization_id in (select public.fn_user_org_ids())
     and public.fn_role_at_least(organization_id, 'agent')
@@ -24222,10 +24312,12 @@ drop policy if exists tenant_isolation_voice_calls_all on public.voice_calls;
 drop policy if exists voice_calls_select on public.voice_calls;
 drop policy if exists voice_calls_write on public.voice_calls;
 
-create policy voice_calls_select on public.voice_calls for select
+create policy voice_calls_select
+  on public.voice_calls for select
   using (organization_id in (select public.fn_user_org_ids()));
 
-create policy voice_calls_write on public.voice_calls for all
+create policy voice_calls_write
+  on public.voice_calls for all
   using (
     organization_id in (select public.fn_user_org_ids())
     and public.fn_role_at_least(organization_id, 'agent')
@@ -24678,13 +24770,15 @@ alter table public.org_voice_calls enable row level security;
 drop policy if exists org_voice_calls_select on public.org_voice_calls;
 drop policy if exists org_voice_calls_admin_write on public.org_voice_calls;
 
-create policy org_voice_calls_select on public.org_voice_calls
+create policy org_voice_calls_select
+  on public.org_voice_calls
   for select using (
     (organization_id in (select public.fn_user_org_ids()))
     or public.fn_is_platform_admin()
   );
 
-create policy org_voice_calls_admin_write on public.org_voice_calls
+create policy org_voice_calls_admin_write
+  on public.org_voice_calls
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -27332,13 +27426,15 @@ comment on column public.calendar_locations.address is
 alter table public.calendar_locations enable row level security;
 
 drop policy if exists calendar_locations_select on public.calendar_locations;
-create policy calendar_locations_select on public.calendar_locations
+create policy calendar_locations_select
+  on public.calendar_locations
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or public.fn_is_platform_admin()
   );
 
 drop policy if exists calendar_locations_insert on public.calendar_locations;
-create policy calendar_locations_insert on public.calendar_locations
+create policy calendar_locations_insert
+  on public.calendar_locations
   for insert with check (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -27910,7 +28006,8 @@ drop policy if exists tenant_isolation_organization_extensions_select on public.
 -- vínculo exige convite aceito de quem é membro e, sem exigir linha de membership,
 -- aceita a sessão de suporte ativa na organização atendida: sem isso, quem dá suporte
 -- via todas as extensões como "desativadas" enquanto o cliente as via ativas.
-create policy tenant_isolation_organization_extensions_select on public.organization_extensions
+create policy tenant_isolation_organization_extensions_select
+  on public.organization_extensions
   for select to authenticated using (
     organization_id in (select public.fn_user_org_ids())
     and (
@@ -28704,9 +28801,10 @@ grant execute on function public.fn_mark_conversation_message(uuid,text,text,tim
 
 -- ── agent_cases ─────────────────────────────────────────────────────────────
 revoke insert, update, delete, truncate on public.agent_cases from authenticated, anon;
-drop policy if exists tenant_isolation_agent_cases_all    on public.agent_cases;
+drop policy if exists tenant_isolation_agent_cases_all on public.agent_cases;
 drop policy if exists tenant_isolation_agent_cases_select on public.agent_cases;
-create policy tenant_isolation_agent_cases_select on public.agent_cases
+create policy tenant_isolation_agent_cases_select
+  on public.agent_cases
   for select to authenticated
   using (organization_id in (select public.fn_user_org_ids()));
 
@@ -32728,7 +32826,8 @@ create index if not exists idx_phone_numbers_active on public.phone_numbers(numb
 alter table public.phone_numbers enable row level security;
 
 drop policy if exists phone_numbers_isolation on public.phone_numbers;
-create policy phone_numbers_isolation on public.phone_numbers
+create policy phone_numbers_isolation
+  on public.phone_numbers
   using (organization_id in (select fn_user_org_ids()))
   with check (organization_id in (select fn_user_org_ids()));
 
@@ -33356,11 +33455,13 @@ alter table public.voip_trunk_settings enable row level security;
 -- SE existe trunk configurado). Escrita: só admin — são credenciais de um
 -- provedor SIP real, o mesmo nível de sensibilidade de ai_provider_credentials.
 drop policy if exists voip_trunk_settings_select on public.voip_trunk_settings;
-create policy voip_trunk_settings_select on public.voip_trunk_settings
+create policy voip_trunk_settings_select
+  on public.voip_trunk_settings
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 drop policy if exists voip_trunk_settings_admin_write on public.voip_trunk_settings;
-create policy voip_trunk_settings_admin_write on public.voip_trunk_settings
+create policy voip_trunk_settings_admin_write
+  on public.voip_trunk_settings
   for all
   using (
     organization_id in (select public.fn_user_org_ids())
@@ -34583,11 +34684,13 @@ create unique index if not exists financial_entries_recorrencia_competencia_idx
 alter table public.recurring_entries enable row level security;
 drop policy if exists tenant_isolation_recurring_entries_all on public.recurring_entries;
 drop policy if exists tenant_isolation_recurring_entries_read on public.recurring_entries;
-create policy tenant_isolation_recurring_entries_read on public.recurring_entries
+create policy tenant_isolation_recurring_entries_read
+  on public.recurring_entries
   for select
   using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
 drop policy if exists tenant_isolation_recurring_entries_write on public.recurring_entries;
-create policy tenant_isolation_recurring_entries_write on public.recurring_entries
+create policy tenant_isolation_recurring_entries_write
+  on public.recurring_entries
   for all
   using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full())
   with check (
@@ -36610,13 +36713,15 @@ alter table public.campaigns enable row level security;
 
 drop policy if exists tenant_isolation_campaigns_all on public.campaigns;
 drop policy if exists campaigns_select on public.campaigns;
-create policy campaigns_select on public.campaigns
+create policy campaigns_select
+  on public.campaigns
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or public.fn_is_platform_admin()
   );
 
 drop policy if exists campaigns_write on public.campaigns;
-create policy campaigns_write on public.campaigns
+create policy campaigns_write
+  on public.campaigns
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -36636,13 +36741,15 @@ alter table public.campaign_recipients enable row level security;
 
 drop policy if exists tenant_isolation_campaign_recipients_all on public.campaign_recipients;
 drop policy if exists campaign_recipients_select on public.campaign_recipients;
-create policy campaign_recipients_select on public.campaign_recipients
+create policy campaign_recipients_select
+  on public.campaign_recipients
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or public.fn_is_platform_admin()
   );
 
 drop policy if exists campaign_recipients_write on public.campaign_recipients;
-create policy campaign_recipients_write on public.campaign_recipients
+create policy campaign_recipients_write
+  on public.campaign_recipients
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -36790,13 +36897,15 @@ create trigger trg_redigir_exclusoes_anonimizado
 alter table public.campaign_templates enable row level security;
 
 drop policy if exists campaign_templates_select on public.campaign_templates;
-create policy campaign_templates_select on public.campaign_templates
+create policy campaign_templates_select
+  on public.campaign_templates
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or public.fn_is_platform_admin()
   );
 
 drop policy if exists campaign_templates_write on public.campaign_templates;
-create policy campaign_templates_write on public.campaign_templates
+create policy campaign_templates_write
+  on public.campaign_templates
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -36815,13 +36924,15 @@ grant all on public.campaign_templates to service_role;
 alter table public.campaign_suppressions enable row level security;
 
 drop policy if exists campaign_suppressions_select on public.campaign_suppressions;
-create policy campaign_suppressions_select on public.campaign_suppressions
+create policy campaign_suppressions_select
+  on public.campaign_suppressions
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or public.fn_is_platform_admin()
   );
 
 drop policy if exists campaign_suppressions_write on public.campaign_suppressions;
-create policy campaign_suppressions_write on public.campaign_suppressions
+create policy campaign_suppressions_write
+  on public.campaign_suppressions
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -36927,13 +37038,15 @@ create index if not exists idx_campaign_recipients_por_numero
 alter table public.campaign_channel_sessions enable row level security;
 
 drop policy if exists campaign_channel_sessions_select on public.campaign_channel_sessions;
-create policy campaign_channel_sessions_select on public.campaign_channel_sessions
+create policy campaign_channel_sessions_select
+  on public.campaign_channel_sessions
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or public.fn_is_platform_admin()
   );
 
 drop policy if exists campaign_channel_sessions_write on public.campaign_channel_sessions;
-create policy campaign_channel_sessions_write on public.campaign_channel_sessions
+create policy campaign_channel_sessions_write
+  on public.campaign_channel_sessions
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -39412,7 +39525,8 @@ create unique index if not exists jev_observacoes_uma_por_mensagem_idx
 -- `authenticated` não tem por que escrever aqui.
 alter table public.jev_observacoes enable row level security;
 drop policy if exists tenant_isolation_jev_observacoes_select on public.jev_observacoes;
-create policy tenant_isolation_jev_observacoes_select on public.jev_observacoes
+create policy tenant_isolation_jev_observacoes_select
+  on public.jev_observacoes
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 -- O ALTER DEFAULT PRIVILEGES do baseline dá GRANT ALL em TABLES a `anon`: toda
@@ -39502,7 +39616,8 @@ create unique index if not exists golden_candidates_uma_por_job_divergencia_idx
 
 alter table public.golden_candidates enable row level security;
 drop policy if exists tenant_isolation_golden_candidates_select on public.golden_candidates;
-create policy tenant_isolation_golden_candidates_select on public.golden_candidates
+create policy tenant_isolation_golden_candidates_select
+  on public.golden_candidates
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 revoke all on public.golden_candidates from anon, authenticated;
@@ -40255,21 +40370,24 @@ alter table public.crm_proposal_items enable row level security;
 -- SELECT tem o bypass de suporte da plataforma (molde de catalog_products);
 -- a escrita não tem, de propósito.
 drop policy if exists crm_proposals_select on public.crm_proposals;
-create policy crm_proposals_select on public.crm_proposals
+create policy crm_proposals_select
+  on public.crm_proposals
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or public.fn_is_platform_admin()
   );
 
 drop policy if exists crm_proposals_write on public.crm_proposals;
 drop policy if exists crm_proposals_insert on public.crm_proposals;
-create policy crm_proposals_insert on public.crm_proposals
+create policy crm_proposals_insert
+  on public.crm_proposals
   for insert
   with check (organization_id in (select public.fn_user_org_ids())
               and public.fn_role_at_least(organization_id, 'agent')
               and status = 'rascunho');
 
 drop policy if exists crm_proposals_update on public.crm_proposals;
-create policy crm_proposals_update on public.crm_proposals
+create policy crm_proposals_update
+  on public.crm_proposals
   for update
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'agent')
@@ -40278,7 +40396,8 @@ create policy crm_proposals_update on public.crm_proposals
               and public.fn_role_at_least(organization_id, 'agent'));
 
 drop policy if exists crm_proposals_delete on public.crm_proposals;
-create policy crm_proposals_delete on public.crm_proposals
+create policy crm_proposals_delete
+  on public.crm_proposals
   for delete
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'manager')
@@ -40339,7 +40458,8 @@ create trigger trg_crm_proposals_transicao_da_sessao
 -- organization_id direto na linha (não mais join com crm_proposals): mais
 -- simples, mais rápido, e é o que a trava de suporte (0274) precisa medir.
 drop policy if exists crm_proposal_items_select on public.crm_proposal_items;
-create policy crm_proposal_items_select on public.crm_proposal_items
+create policy crm_proposal_items_select
+  on public.crm_proposal_items
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or public.fn_is_platform_admin()
   );
@@ -40348,7 +40468,8 @@ create policy crm_proposal_items_select on public.crm_proposal_items
 -- item de uma proposta enviada é o que o cliente recebeu, e a v2 é clonada
 -- pelo servidor. O `delete` do rascunho leva os itens pela FK, sem RLS.
 drop policy if exists crm_proposal_items_write on public.crm_proposal_items;
-create policy crm_proposal_items_write on public.crm_proposal_items
+create policy crm_proposal_items_write
+  on public.crm_proposal_items
   for all
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'agent')
@@ -40772,7 +40893,8 @@ alter table public.proposal_templates enable row level security;
 drop policy if exists tenant_isolation_proposal_templates_all on public.proposal_templates;
 
 drop policy if exists proposal_templates_select on public.proposal_templates;
-create policy proposal_templates_select on public.proposal_templates
+create policy proposal_templates_select
+  on public.proposal_templates
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or public.fn_is_platform_admin()
   );
@@ -40836,7 +40958,8 @@ comment on column public.proposal_templates.descricao is
   'Para que serve este modelo, em uma frase. Opcional.';
 
 drop policy if exists proposal_templates_write on public.proposal_templates;
-create policy proposal_templates_write on public.proposal_templates
+create policy proposal_templates_write
+  on public.proposal_templates
   for all
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'manager'))
@@ -41494,21 +41617,25 @@ alter table public.companies enable row level security;
 
 drop policy if exists tenant_isolation_companies_all on public.companies;
 drop policy if exists companies_select on public.companies;
-create policy companies_select on public.companies
+create policy companies_select
+  on public.companies
   for select using (organization_id in (select public.fn_user_org_ids()));
 drop policy if exists companies_insert on public.companies;
-create policy companies_insert on public.companies
+create policy companies_insert
+  on public.companies
   for insert with check (organization_id in (select public.fn_user_org_ids())
                          and public.fn_role_at_least(organization_id, 'manager'));
 drop policy if exists companies_update on public.companies;
-create policy companies_update on public.companies
+create policy companies_update
+  on public.companies
   for update
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'agent'))
   with check (organization_id in (select public.fn_user_org_ids())
               and public.fn_role_at_least(organization_id, 'agent'));
 drop policy if exists companies_delete on public.companies;
-create policy companies_delete on public.companies
+create policy companies_delete
+  on public.companies
   for delete using (organization_id in (select public.fn_user_org_ids())
                     and public.fn_role_at_least(organization_id, 'manager'));
 
@@ -41547,21 +41674,25 @@ alter table public.people enable row level security;
 
 drop policy if exists tenant_isolation_people_all on public.people;
 drop policy if exists people_select on public.people;
-create policy people_select on public.people
+create policy people_select
+  on public.people
   for select using (organization_id in (select public.fn_user_org_ids()));
 drop policy if exists people_insert on public.people;
-create policy people_insert on public.people
+create policy people_insert
+  on public.people
   for insert with check (organization_id in (select public.fn_user_org_ids())
                          and public.fn_role_at_least(organization_id, 'manager'));
 drop policy if exists people_update on public.people;
-create policy people_update on public.people
+create policy people_update
+  on public.people
   for update
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'agent'))
   with check (organization_id in (select public.fn_user_org_ids())
               and public.fn_role_at_least(organization_id, 'agent'));
 drop policy if exists people_delete on public.people;
-create policy people_delete on public.people
+create policy people_delete
+  on public.people
   for delete using (organization_id in (select public.fn_user_org_ids())
                     and public.fn_role_at_least(organization_id, 'manager'));
 
@@ -41605,21 +41736,25 @@ alter table public.company_people enable row level security;
 
 drop policy if exists tenant_isolation_company_people_all on public.company_people;
 drop policy if exists company_people_select on public.company_people;
-create policy company_people_select on public.company_people
+create policy company_people_select
+  on public.company_people
   for select using (organization_id in (select public.fn_user_org_ids()));
 drop policy if exists company_people_insert on public.company_people;
-create policy company_people_insert on public.company_people
+create policy company_people_insert
+  on public.company_people
   for insert with check (organization_id in (select public.fn_user_org_ids())
                          and public.fn_role_at_least(organization_id, 'manager'));
 drop policy if exists company_people_update on public.company_people;
-create policy company_people_update on public.company_people
+create policy company_people_update
+  on public.company_people
   for update
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'agent'))
   with check (organization_id in (select public.fn_user_org_ids())
               and public.fn_role_at_least(organization_id, 'agent'));
 drop policy if exists company_people_delete on public.company_people;
-create policy company_people_delete on public.company_people
+create policy company_people_delete
+  on public.company_people
   for delete using (organization_id in (select public.fn_user_org_ids())
                     and public.fn_role_at_least(organization_id, 'manager'));
 
@@ -41741,21 +41876,25 @@ alter table public.import_batches enable row level security;
 
 drop policy if exists tenant_isolation_import_batches_all on public.import_batches;
 drop policy if exists import_batches_select on public.import_batches;
-create policy import_batches_select on public.import_batches
+create policy import_batches_select
+  on public.import_batches
   for select using (organization_id in (select public.fn_user_org_ids()));
 drop policy if exists import_batches_insert on public.import_batches;
-create policy import_batches_insert on public.import_batches
+create policy import_batches_insert
+  on public.import_batches
   for insert with check (organization_id in (select public.fn_user_org_ids())
                          and public.fn_role_at_least(organization_id, 'manager'));
 drop policy if exists import_batches_update on public.import_batches;
-create policy import_batches_update on public.import_batches
+create policy import_batches_update
+  on public.import_batches
   for update
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'manager'))
   with check (organization_id in (select public.fn_user_org_ids())
               and public.fn_role_at_least(organization_id, 'manager'));
 drop policy if exists import_batches_delete on public.import_batches;
-create policy import_batches_delete on public.import_batches
+create policy import_batches_delete
+  on public.import_batches
   for delete using (organization_id in (select public.fn_user_org_ids())
                     and public.fn_role_at_least(organization_id, 'manager'));
 
@@ -41795,21 +41934,25 @@ alter table public.import_rows enable row level security;
 
 drop policy if exists tenant_isolation_import_rows_all on public.import_rows;
 drop policy if exists import_rows_select on public.import_rows;
-create policy import_rows_select on public.import_rows
+create policy import_rows_select
+  on public.import_rows
   for select using (organization_id in (select public.fn_user_org_ids()));
 drop policy if exists import_rows_insert on public.import_rows;
-create policy import_rows_insert on public.import_rows
+create policy import_rows_insert
+  on public.import_rows
   for insert with check (organization_id in (select public.fn_user_org_ids())
                          and public.fn_role_at_least(organization_id, 'manager'));
 drop policy if exists import_rows_update on public.import_rows;
-create policy import_rows_update on public.import_rows
+create policy import_rows_update
+  on public.import_rows
   for update
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'manager'))
   with check (organization_id in (select public.fn_user_org_ids())
               and public.fn_role_at_least(organization_id, 'manager'));
 drop policy if exists import_rows_delete on public.import_rows;
-create policy import_rows_delete on public.import_rows
+create policy import_rows_delete
+  on public.import_rows
   for delete using (organization_id in (select public.fn_user_org_ids())
                     and public.fn_role_at_least(organization_id, 'manager'));
 
@@ -41955,7 +42098,8 @@ alter table public.channel_session_groups enable row level security;
 drop policy if exists tenant_isolation_channel_session_groups_all on public.channel_session_groups;
 drop policy if exists channel_session_groups_select on public.channel_session_groups;
 drop policy if exists channel_session_groups_write on public.channel_session_groups;
-create policy channel_session_groups_select on public.channel_session_groups
+create policy channel_session_groups_select
+  on public.channel_session_groups
   for select using (organization_id in (select public.fn_user_org_ids()));
 revoke insert, update, delete, truncate on public.channel_session_groups from anon, authenticated;
 
@@ -43253,7 +43397,7 @@ create trigger trg_lgpd_secoes_de_modulo
   execute function public.fn_lgpd_redigir_secoes_de_modulo();
 -- ---- a provisionadora do financeiro entra no schema (migration 0619) ----
 --
--- CÓPIA LITERAL do bloco da migration 0619 que cria
+-- CÓPIA LITERAL do bloco atualizado pela migration 9022 para
 -- `public.fn_financeiro_provisionar()` — e é cópia por geração, não por mão:
 -- `tests/unit/apendice-do-baseline-nao-diverge-da-cadeia.test.ts` compara o
 -- corpo das funções escritas à mão no apêndice com a última definição da cadeia,
@@ -43276,6 +43420,27 @@ create trigger trg_lgpd_secoes_de_modulo
 -- O SQL é o MESMO da migration, e a razão é a D6: a função é idempotente e o
 -- kit reaplica o baseline inteiro na instalação e em cada atualização.
 
+create or replace function public.fn_financeiro_guard_sale_item_delete()
+returns trigger
+language plpgsql
+set search_path = public, pg_temp
+as $guard$
+declare v_status text;
+begin
+  -- A cascata da remoção de uma organização/comanda é responsabilidade da FK.
+  if pg_trigger_depth() > 1 then return old; end if;
+  select s.status into v_status
+    from public.sales s
+   where s.id = old.sale_id and s.organization_id = old.organization_id
+   for update;
+  if not found or v_status <> 'open' then
+    raise exception using errcode = '42501', message = 'sale_item_delete_requires_open_sale';
+  end if;
+  return old;
+end
+$guard$;
+revoke execute on function public.fn_financeiro_guard_sale_item_delete() from public, anon, authenticated, service_role;
+
 create or replace function public.fn_financeiro_provisionar()
 returns void
 language plpgsql
@@ -43283,214 +43448,219 @@ security definer
 set search_path = public, pg_temp
 as $f$
 begin
+-- ─── a comanda ───────────────────────────────────────────────────────────────
+create table if not exists public.sales (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
 
-  -- ─── a comanda ───────────────────────────────────────────────────────────────
-  create table if not exists public.sales (
-    id uuid primary key default gen_random_uuid(),
-    organization_id uuid not null references public.organizations(id) on delete cascade,
+  -- Número visível, por organização. `bigint` e não `serial`: a sequência é
+  -- própria de cada tenant (ver `fn_proximo_numero_de_comanda`), e um serial
+  -- global vazaria o volume de um cliente para outro.
+  number bigint not null,
 
-    -- Número visível, por organização. `bigint` e não `serial`: a sequência é
-    -- própria de cada tenant (ver `fn_proximo_numero_de_comanda`), e um serial
-    -- global vazaria o volume de um cliente para outro.
-    number bigint not null,
+  contact_id uuid references public.contacts(id) on delete set null,
+  -- Quem atendeu. `set null` porque a pessoa pode sair da equipe e a venda
+  -- continua tendo acontecido.
+  attendant_user_id uuid references auth.users(id) on delete set null,
+  appointment_id uuid references public.calendar_appointments(id) on delete set null,
 
-    contact_id uuid references public.contacts(id) on delete set null,
-    -- Quem atendeu. `set null` porque a pessoa pode sair da equipe e a venda
-    -- continua tendo acontecido.
-    attendant_user_id uuid references auth.users(id) on delete set null,
-    appointment_id uuid references public.calendar_appointments(id) on delete set null,
+  status text not null default 'open'
+    check (status in ('open', 'finalized', 'cancelled')),
 
-    status text not null default 'open'
-      check (status in ('open', 'finalized', 'cancelled')),
+  -- Desconto da COMANDA, separado do desconto de item. Fidelidade e comissão
+  -- incidem sobre o item, nunca sobre este — senão um desconto de caixa
+  -- reduziria o prêmio de quem atendeu.
+  discount_cents bigint not null default 0 check (discount_cents >= 0),
+  total_cents bigint not null default 0,
+  currency text not null default 'BRL' check (char_length(currency) = 3),
 
-    -- Desconto da COMANDA, separado do desconto de item. Fidelidade e comissão
-    -- incidem sobre o item, nunca sobre este — senão um desconto de caixa
-    -- reduziria o prêmio de quem atendeu.
-    discount_cents bigint not null default 0 check (discount_cents >= 0),
-    total_cents bigint not null default 0,
-    currency text not null default 'BRL' check (char_length(currency) = 3),
+  payment_method_id uuid references public.payment_methods(id) on delete restrict,
 
-    payment_method_id uuid references public.payment_methods(id) on delete restrict,
+  notes text,
+  finalized_at timestamptz,
+  cancelled_at timestamptz,
+  cancel_reason text,
+  -- Estornada: a comanda continua finalizada e ganha o contra-lançamento.
+  reversed_at timestamptz,
+  reverse_reason text,
 
-    notes text,
-    finalized_at timestamptz,
-    cancelled_at timestamptz,
-    cancel_reason text,
-    -- Estornada: a comanda continua finalizada e ganha o contra-lançamento.
-    reversed_at timestamptz,
-    reverse_reason text,
+  created_by_user_id uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
 
-    created_by_user_id uuid references auth.users(id) on delete set null,
-    created_at timestamptz not null default now(),
-    updated_at timestamptz not null default now(),
+  -- Finalizar exige forma de pagamento: é ela que diz em que conta o dinheiro
+  -- cai. Sem isso, a entrada não teria destino — e o CHECK diz isso no schema,
+  -- não numa validação que alguém pode esquecer de chamar.
+  constraint sales_finalizada_tem_forma
+    check (status <> 'finalized' or payment_method_id is not null)
+);
 
-    -- Finalizar exige forma de pagamento: é ela que diz em que conta o dinheiro
-    -- cai. Sem isso, a entrada não teria destino — e o CHECK diz isso no schema,
-    -- não numa validação que alguém pode esquecer de chamar.
-    constraint sales_finalizada_tem_forma
-      check (status <> 'finalized' or payment_method_id is not null)
-  );
+create unique index if not exists sales_org_numero_key on public.sales (organization_id, number);
+create index if not exists sales_org_status_idx on public.sales (organization_id, status, created_at desc);
+create index if not exists sales_org_contato_idx on public.sales (organization_id, contact_id);
+create index if not exists sales_appointment_idx on public.sales (appointment_id)
+  where appointment_id is not null;
 
-  create unique index if not exists sales_org_numero_key on public.sales (organization_id, number);
-  create index if not exists sales_org_status_idx on public.sales (organization_id, status, created_at desc);
-  create index if not exists sales_org_contato_idx on public.sales (organization_id, contact_id);
-  create index if not exists sales_appointment_idx on public.sales (appointment_id)
-    where appointment_id is not null;
+-- ─── o item ──────────────────────────────────────────────────────────────────
+create table if not exists public.sale_items (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  -- `cascade` aqui e só aqui: item não existe fora da comanda, e comanda não é
+  -- apagada (cancela). O cascade só dispara se a ORGANIZAÇÃO inteira sair.
+  sale_id uuid not null references public.sales(id) on delete cascade,
 
-  -- ─── o item ──────────────────────────────────────────────────────────────────
-  create table if not exists public.sale_items (
-    id uuid primary key default gen_random_uuid(),
-    organization_id uuid not null references public.organizations(id) on delete cascade,
-    -- `cascade` aqui e só aqui: item não existe fora da comanda, e comanda não é
-    -- apagada (cancela). O cascade só dispara se a ORGANIZAÇÃO inteira sair.
-    sale_id uuid not null references public.sales(id) on delete cascade,
+  -- O que foi feito. `event_type_id` porque, neste produto, o catálogo de
+  -- serviços JÁ é `calendar_event_types` — criar uma tabela de serviços ao lado
+  -- seria a segunda fonte da mesma verdade.
+  event_type_id uuid references public.calendar_event_types(id) on delete restrict,
+  -- Congelado na inclusão: o nome muda, a linha da venda não.
+  description text not null,
 
-    -- O que foi feito. `event_type_id` porque, neste produto, o catálogo de
-    -- serviços JÁ é `calendar_event_types` — criar uma tabela de serviços ao lado
-    -- seria a segunda fonte da mesma verdade.
-    event_type_id uuid references public.calendar_event_types(id) on delete restrict,
-    -- Congelado na inclusão: o nome muda, a linha da venda não.
-    description text not null,
+  attendant_user_id uuid references auth.users(id) on delete set null,
 
-    attendant_user_id uuid references auth.users(id) on delete set null,
+  quantity integer not null default 1 check (quantity > 0),
+  unit_price_cents bigint not null check (unit_price_cents >= 0),
+  discount_cents bigint not null default 0 check (discount_cents >= 0),
+  total_cents bigint not null,
 
-    quantity integer not null default 1 check (quantity > 0),
-    unit_price_cents bigint not null check (unit_price_cents >= 0),
-    discount_cents bigint not null default 0 check (discount_cents >= 0),
-    total_cents bigint not null,
+  -- ⚠️ RESOLVIDA NA INCLUSÃO e gravada aqui. A finalização não recalcula:
+  -- mudar a regra amanhã não mexe no que já foi combinado ontem.
+  commission_percent numeric(5, 2) not null default 0
+    check (commission_percent >= 0 and commission_percent <= 100),
 
-    -- ⚠️ RESOLVIDA NA INCLUSÃO e gravada aqui. A finalização não recalcula:
-    -- mudar a regra amanhã não mexe no que já foi combinado ontem.
-    commission_percent numeric(5, 2) not null default 0
-      check (commission_percent >= 0 and commission_percent <= 100),
+  created_at timestamptz not null default now()
+);
 
-    created_at timestamptz not null default now()
-  );
+create index if not exists sale_items_sale_idx on public.sale_items (sale_id);
+create index if not exists sale_items_org_idx on public.sale_items (organization_id, created_at desc);
 
-  create index if not exists sale_items_sale_idx on public.sale_items (sale_id);
-  create index if not exists sale_items_org_idx on public.sale_items (organization_id, created_at desc);
+-- ─── a regra de comissão ─────────────────────────────────────────────────────
+--
+-- Precedência: (pessoa + serviço) → (pessoa) → (serviço). A mais específica
+-- vence, e é por isso que as três colunas são nullable com um índice único por
+-- combinação — não há linha "curinga" mágica, há ausência.
+create table if not exists public.commission_rules (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
 
-  -- ─── a regra de comissão ─────────────────────────────────────────────────────
-  --
-  -- Precedência: (pessoa + serviço) → (pessoa) → (serviço). A mais específica
-  -- vence, e é por isso que as três colunas são nullable com um índice único por
-  -- combinação — não há linha "curinga" mágica, há ausência.
-  create table if not exists public.commission_rules (
-    id uuid primary key default gen_random_uuid(),
-    organization_id uuid not null references public.organizations(id) on delete cascade,
+  attendant_user_id uuid references auth.users(id) on delete cascade,
+  event_type_id uuid references public.calendar_event_types(id) on delete cascade,
 
-    attendant_user_id uuid references auth.users(id) on delete cascade,
-    event_type_id uuid references public.calendar_event_types(id) on delete cascade,
+  percent numeric(5, 2) not null check (percent >= 0 and percent <= 100),
 
-    percent numeric(5, 2) not null check (percent >= 0 and percent <= 100),
+  created_at timestamptz not null default now(),
 
-    created_at timestamptz not null default now(),
+  -- Pelo menos um dos dois: uma regra sem pessoa E sem serviço seria a regra
+  -- "de tudo", que é o default da organização e mora em outro lugar.
+  constraint commission_rules_tem_alvo
+    check (attendant_user_id is not null or event_type_id is not null)
+);
 
-    -- Pelo menos um dos dois: uma regra sem pessoa E sem serviço seria a regra
-    -- "de tudo", que é o default da organização e mora em outro lugar.
-    constraint commission_rules_tem_alvo
-      check (attendant_user_id is not null or event_type_id is not null)
-  );
+-- `coalesce` no índice: NULL não colide com NULL numa UNIQUE, e sem isto duas
+-- regras "só para a Ana" passariam as duas, em silêncio.
+create unique index if not exists commission_rules_alvo_key on public.commission_rules (
+  organization_id,
+  coalesce(attendant_user_id, '00000000-0000-0000-0000-000000000000'::uuid),
+  coalesce(event_type_id, '00000000-0000-0000-0000-000000000000'::uuid)
+);
 
-  -- `coalesce` no índice: NULL não colide com NULL numa UNIQUE, e sem isto duas
-  -- regras "só para a Ana" passariam as duas, em silêncio.
-  create unique index if not exists commission_rules_alvo_key on public.commission_rules (
-    organization_id,
-    coalesce(attendant_user_id, '00000000-0000-0000-0000-000000000000'::uuid),
-    coalesce(event_type_id, '00000000-0000-0000-0000-000000000000'::uuid)
-  );
+-- ─── a comissão gerada ───────────────────────────────────────────────────────
+create table if not exists public.commissions (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  sale_item_id uuid not null references public.sale_items(id) on delete cascade,
+  attendant_user_id uuid not null references auth.users(id) on delete restrict,
 
-  -- ─── a comissão gerada ───────────────────────────────────────────────────────
-  create table if not exists public.commissions (
-    id uuid primary key default gen_random_uuid(),
-    organization_id uuid not null references public.organizations(id) on delete cascade,
-    sale_item_id uuid not null references public.sale_items(id) on delete cascade,
-    attendant_user_id uuid not null references auth.users(id) on delete restrict,
+  percent numeric(5, 2) not null,
+  amount_cents bigint not null,
 
-    percent numeric(5, 2) not null,
-    amount_cents bigint not null,
+  status text not null default 'pending' check (status in ('pending', 'paid', 'reversed')),
+  paid_at timestamptz,
+  reversed_at timestamptz,
 
-    status text not null default 'pending' check (status in ('pending', 'paid', 'reversed')),
-    paid_at timestamptz,
-    reversed_at timestamptz,
+  created_at timestamptz not null default now()
+);
 
-    created_at timestamptz not null default now()
-  );
+create unique index if not exists commissions_item_key on public.commissions (sale_item_id);
+create index if not exists commissions_org_pessoa_idx
+  on public.commissions (organization_id, attendant_user_id, status);
 
-  create unique index if not exists commissions_item_key on public.commissions (sale_item_id);
-  create index if not exists commissions_org_pessoa_idx
-    on public.commissions (organization_id, attendant_user_id, status);
+-- ─── o livro-razão da fidelidade ─────────────────────────────────────────────
+--
+-- LEDGER, não saldo. O saldo do cliente é `sum(points)` e nunca uma coluna:
+-- guardar o saldo faria o primeiro estorno divergir em silêncio.
+create table if not exists public.loyalty_ledger (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  contact_id uuid not null references public.contacts(id) on delete cascade,
 
-  -- ─── o livro-razão da fidelidade ─────────────────────────────────────────────
-  --
-  -- LEDGER, não saldo. O saldo do cliente é `sum(points)` e nunca uma coluna:
-  -- guardar o saldo faria o primeiro estorno divergir em silêncio.
-  create table if not exists public.loyalty_ledger (
-    id uuid primary key default gen_random_uuid(),
-    organization_id uuid not null references public.organizations(id) on delete cascade,
-    contact_id uuid not null references public.contacts(id) on delete cascade,
+  -- Assinado: ganhar é positivo, resgatar é negativo. Uma coluna de "tipo" ao
+  -- lado seria a segunda forma de dizer o mesmo sinal.
+  points integer not null,
+  reason text not null,
 
-    -- Assinado: ganhar é positivo, resgatar é negativo. Uma coluna de "tipo" ao
-    -- lado seria a segunda forma de dizer o mesmo sinal.
-    points integer not null,
-    reason text not null,
+  sale_id uuid references public.sales(id) on delete set null,
+  sale_item_id uuid references public.sale_items(id) on delete set null,
 
-    sale_id uuid references public.sales(id) on delete set null,
-    sale_item_id uuid references public.sale_items(id) on delete set null,
+  -- Idempotência do ganho: finalizar a mesma comanda duas vezes não dá ponto
+  -- em dobro. A UNIQUE parcial é a garantia, não a boa intenção de quem chama.
+  idempotency_key text,
 
-    -- Idempotência do ganho: finalizar a mesma comanda duas vezes não dá ponto
-    -- em dobro. A UNIQUE parcial é a garantia, não a boa intenção de quem chama.
-    idempotency_key text,
+  created_by_user_id uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now()
+);
 
-    created_by_user_id uuid references auth.users(id) on delete set null,
-    created_at timestamptz not null default now()
-  );
+create unique index if not exists loyalty_ledger_idem_key
+  on public.loyalty_ledger (organization_id, idempotency_key)
+  where idempotency_key is not null;
+create index if not exists loyalty_ledger_contato_idx
+  on public.loyalty_ledger (organization_id, contact_id, created_at desc);
+-- 0354 — a regra de comissão entra no catálogo, e para isso INATIVA em vez de
+-- sumir: o percentual já aplicado está congelado no item, então apagar perderia
+-- a resposta a "por que aquela comanda saiu com este percentual".
+alter table public.commission_rules
+  add column if not exists name text not null default 'Regra de comissão';
 
-  create unique index if not exists loyalty_ledger_idem_key
-    on public.loyalty_ledger (organization_id, idempotency_key)
-    where idempotency_key is not null;
-  create index if not exists loyalty_ledger_contato_idx
-    on public.loyalty_ledger (organization_id, contact_id, created_at desc);
-  -- 0354 — a regra de comissão entra no catálogo, e para isso INATIVA em vez de
-  -- sumir: o percentual já aplicado está congelado no item, então apagar perderia
-  -- a resposta a "por que aquela comanda saiu com este percentual".
-  alter table public.commission_rules
-    add column if not exists name text not null default 'Regra de comissão';
+alter table public.commission_rules
+  add column if not exists is_active boolean not null default true;
 
-  alter table public.commission_rules
-    add column if not exists is_active boolean not null default true;
+comment on column public.commission_rules.is_active is
+  'Regra em vigor. Inativa em vez de apagar: o percentual já aplicado está congelado no item, e o que se perderia é a resposta a "por que aquela comanda saiu com este percentual".';
 
-  comment on column public.commission_rules.is_active is
-    'Regra em vigor. Inativa em vez de apagar: o percentual já aplicado está congelado no item, e o que se perderia é a resposta a "por que aquela comanda saiu com este percentual".';
+create index if not exists commission_rules_org_ativas_idx
+  on public.commission_rules (organization_id, event_type_id, attendant_user_id)
+  where is_active;
 
-  create index if not exists commission_rules_org_ativas_idx
-    on public.commission_rules (organization_id, event_type_id, attendant_user_id)
-    where is_active;
+-- 0352 — uma comanda por agendamento. PARCIAL nas duas condições: comanda avulsa
+-- é a maioria e não se exclui de comanda de agendamento, e comanda cancelada
+-- deixa de valer (sem isto, cancelar por engano trancaria o agendamento para
+-- sempre, sem conserto pela tela).
+create unique index if not exists sales_agendamento_unico_idx
+  on public.sales (organization_id, appointment_id)
+  where appointment_id is not null and status <> 'cancelled';
 
-  -- 0352 — uma comanda por agendamento. PARCIAL nas duas condições: comanda avulsa
-  -- é a maioria e não se exclui de comanda de agendamento, e comanda cancelada
-  -- deixa de valer (sem isto, cancelar por engano trancaria o agendamento para
-  -- sempre, sem conserto pela tela).
-  create unique index if not exists sales_agendamento_unico_idx
-    on public.sales (organization_id, appointment_id)
-    where appointment_id is not null and status <> 'cancelled';
+-- Os comentários das tabelas da comanda moram AQUI, e não no bloco do RLS do
+-- núcleo: `comment on table` no baseline recriaria as tabelas num banco onde o
+-- módulo não está instalado — que é exatamente o que a D2 proíbe.
+comment on table public.sales is
+  'A comanda. Cancela, nunca apaga. `number` é sequencial por organização e não reinicia.';
+comment on table public.loyalty_ledger is
+  'Livro-razão de fidelidade. O saldo do cliente é sum(points) — NUNCA uma coluna.';
 
-  -- Os comentários das tabelas da comanda moram AQUI, e não no bloco do RLS do
-  -- núcleo: `comment on table` no baseline recriaria as tabelas num banco onde o
-  -- módulo não está instalado — que é exatamente o que a D2 proíbe.
-  comment on table public.sales is
-    'A comanda. Cancela, nunca apaga. `number` é sequencial por organização e não reinicia.';
-  comment on table public.loyalty_ledger is
-    'Livro-razão de fidelidade. O saldo do cliente é sum(points) — NUNCA uma coluna.';
-
-  -- A FK do caixa (`financial_entries.sale_id → sales.id`) SAIU do corpo: molde da
-  -- onda 10 proíbe corpo de provisionadora alterar tabela do núcleo. Ela passou a
-  -- `fn_financeiro_ligar_caixa_a_comanda()`, definida no fim do bloco desta
-  -- migration (mesmo código da cadeia, gate `apendice-do-baseline-nao-diverge`):
-  -- a provisionadora chama a rotina, e o topo também — onde a comanda já existe,
-  -- a FK nasce na própria passada do kit. A conferência é por EXISTÊNCIA de
-  -- qualquer FK da relação, para não criar a segunda onde já há
-  -- `financial_entries_sale_id_fkey` (item 5 do #1907).
+-- A FK que o caixa perdeu (`financial_entries.sale_id → sales.id`, `on delete set
+-- null`) SAIU do corpo desta função: `financial_entries` é tabela do NÚCLEO, e o
+-- molde da onda 10 (`tests/invariants/provisionadora-de-modulo.test.ts`) não deixa
+-- o corpo de uma provisionadora alterar tabela do núcleo — a regra é o inverso,
+-- "FK do módulo para o núcleo", e vale para a FK nascer na tabela do módulo
+-- (`sale_items.sale_id → sales.id` está aqui embaixo).
+--
+-- A criação dela agora é rotina própria, `fn_financeiro_ligar_caixa_a_comanda()`,
+-- definida no fim desta migration: a provisionadora CHAMA a rotina (a FK continua
+-- nascendo no provisionamento) e o topo também, já na passada do kit onde a
+-- comanda já existe. Em ambos, o `not exists` passou a olhar QUALQUER FK de
+-- `financial_entries.sale_id → sales` em vez de um nome fixo — a 0351 trazia
+-- `financeiro_sale_id_fkey` e a main traz `financial_entries_sale_id_fkey`, e
+-- conferir um nome só criaria a segunda FK (item 5 do PR #1907).
 
   -- ── RLS das cinco tabelas, declarada por ESTA função (#1906 + D5) ──────────
   -- A rotina 0325 (`fn_proteger_tabelas_de_organizacao`) só enxerga tabela com
@@ -43504,124 +43674,141 @@ begin
   -- de quem tem o módulo instalado. É a quebra entre as duas linhas que tira
   -- a regra do olhar daquela varredura sem tirar a regra da tabela.
   --
-  -- 0533 (#2115): o `tenant_isolation_<t>_all` virou o PAR `_read`/`_write`,
-  -- o mesmo desenho que o baseline dá a `financial_entries` no núcleo. Leitura
-  -- com a função pura (o `support_readonly` continua LENDO a comanda); escrita
-  -- com `scope='full'` e papel `agent+` — era isso que a política larga escondia:
-  -- sem o par, quem só lê escrevia a comanda inteira. O `drop ... _all` fica em
-  -- cada bloco para o reaplicar (D6) converter banco provisionado pela versão
-  -- antiga do corpo, e o par nasce AQUI porque a rotina 0325 só enxerga tabela
-  -- com RLS DESLIGADA — estas já nascem ligadas.
+  -- A versão anterior usava policies `_write FOR ALL`: o papel `agent+`
+  -- aparecia em WITH CHECK, que não autoriza DELETE. Agora cada operação tem
+  -- policy própria, com USING/WITH CHECK coerentes, vínculo sale-item/comanda
+  -- na mesma organização e remoção de item limitada a comanda aberta.
   alter table public.sales enable row level security;
   revoke all on public.sales from anon;
   drop policy if exists tenant_isolation_sales_all on public.sales;
   drop policy if exists tenant_isolation_sales_read on public.sales;
   create policy tenant_isolation_sales_read
-    on public.sales for select
-    using (organization_id in (select public.fn_user_org_ids())
-           or public.fn_is_platform_admin());
+  on public.sales for select
+    using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
   drop policy if exists tenant_isolation_sales_write on public.sales;
-  create policy tenant_isolation_sales_write
-    on public.sales for all
-    using (organization_id in (select public.fn_user_org_ids())
-           or public.fn_is_platform_admin_full())
-    with check (
-      public.fn_is_platform_admin_full()
-      or (organization_id in (select public.fn_user_org_ids())
-          and public.fn_role_at_least(organization_id, 'agent'))
-    );
-
+  drop policy if exists tenant_isolation_sales_insert on public.sales;
+  create policy tenant_isolation_sales_insert
+  on public.sales for insert
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_sales_update on public.sales;
+  create policy tenant_isolation_sales_update
+  on public.sales for update
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))))
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_sales_delete on public.sales;
+  create policy tenant_isolation_sales_delete
+  on public.sales for delete
+    using (public.fn_is_platform_admin_full());
   alter table public.sale_items enable row level security;
   revoke all on public.sale_items from anon;
   drop policy if exists tenant_isolation_sale_items_all on public.sale_items;
   drop policy if exists tenant_isolation_sale_items_read on public.sale_items;
   create policy tenant_isolation_sale_items_read
-    on public.sale_items for select
-    using (organization_id in (select public.fn_user_org_ids())
-           or public.fn_is_platform_admin());
+  on public.sale_items for select
+    using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
   drop policy if exists tenant_isolation_sale_items_write on public.sale_items;
-  create policy tenant_isolation_sale_items_write
-    on public.sale_items for all
-    using (organization_id in (select public.fn_user_org_ids())
-           or public.fn_is_platform_admin_full())
-    with check (
-      public.fn_is_platform_admin_full()
-      or (organization_id in (select public.fn_user_org_ids())
-          and public.fn_role_at_least(organization_id, 'agent'))
-    );
-
+  drop policy if exists tenant_isolation_sale_items_insert on public.sale_items;
+  create policy tenant_isolation_sale_items_insert
+  on public.sale_items for insert
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))) and exists (select 1 from public.sales s where s.id = sale_items.sale_id and s.organization_id = sale_items.organization_id));
+  drop policy if exists tenant_isolation_sale_items_update on public.sale_items;
+  create policy tenant_isolation_sale_items_update
+  on public.sale_items for update
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))) and exists (select 1 from public.sales s where s.id = sale_items.sale_id and s.organization_id = sale_items.organization_id))
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))) and exists (select 1 from public.sales s where s.id = sale_items.sale_id and s.organization_id = sale_items.organization_id));
+  drop policy if exists tenant_isolation_sale_items_delete on public.sale_items;
+  create policy tenant_isolation_sale_items_delete
+  on public.sale_items for delete
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))) and exists (select 1 from public.sales s where s.id = sale_items.sale_id and s.organization_id = sale_items.organization_id and s.status = 'open'));
   alter table public.commission_rules enable row level security;
   revoke all on public.commission_rules from anon;
   drop policy if exists tenant_isolation_commission_rules_all on public.commission_rules;
   drop policy if exists tenant_isolation_commission_rules_read on public.commission_rules;
   create policy tenant_isolation_commission_rules_read
-    on public.commission_rules for select
-    using (organization_id in (select public.fn_user_org_ids())
-           or public.fn_is_platform_admin());
+  on public.commission_rules for select
+    using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
   drop policy if exists tenant_isolation_commission_rules_write on public.commission_rules;
-  create policy tenant_isolation_commission_rules_write
-    on public.commission_rules for all
-    using (organization_id in (select public.fn_user_org_ids())
-           or public.fn_is_platform_admin_full())
-    with check (
-      public.fn_is_platform_admin_full()
-      or (organization_id in (select public.fn_user_org_ids())
-          and public.fn_role_at_least(organization_id, 'agent'))
-    );
-
+  drop policy if exists tenant_isolation_commission_rules_insert on public.commission_rules;
+  create policy tenant_isolation_commission_rules_insert
+  on public.commission_rules for insert
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_commission_rules_update on public.commission_rules;
+  create policy tenant_isolation_commission_rules_update
+  on public.commission_rules for update
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))))
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_commission_rules_delete on public.commission_rules;
+  create policy tenant_isolation_commission_rules_delete
+  on public.commission_rules for delete
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
   alter table public.commissions enable row level security;
   revoke all on public.commissions from anon;
   drop policy if exists tenant_isolation_commissions_all on public.commissions;
   drop policy if exists tenant_isolation_commissions_read on public.commissions;
   create policy tenant_isolation_commissions_read
-    on public.commissions for select
-    using (organization_id in (select public.fn_user_org_ids())
-           or public.fn_is_platform_admin());
+  on public.commissions for select
+    using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
   drop policy if exists tenant_isolation_commissions_write on public.commissions;
-  create policy tenant_isolation_commissions_write
-    on public.commissions for all
-    using (organization_id in (select public.fn_user_org_ids())
-           or public.fn_is_platform_admin_full())
-    with check (
-      public.fn_is_platform_admin_full()
-      or (organization_id in (select public.fn_user_org_ids())
-          and public.fn_role_at_least(organization_id, 'agent'))
-    );
-
+  drop policy if exists tenant_isolation_commissions_insert on public.commissions;
+  create policy tenant_isolation_commissions_insert
+  on public.commissions for insert
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_commissions_update on public.commissions;
+  create policy tenant_isolation_commissions_update
+  on public.commissions for update
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))))
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_commissions_delete on public.commissions;
+  create policy tenant_isolation_commissions_delete
+  on public.commissions for delete
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
   alter table public.loyalty_ledger enable row level security;
   revoke all on public.loyalty_ledger from anon;
   drop policy if exists tenant_isolation_loyalty_ledger_all on public.loyalty_ledger;
   drop policy if exists tenant_isolation_loyalty_ledger_read on public.loyalty_ledger;
   create policy tenant_isolation_loyalty_ledger_read
-    on public.loyalty_ledger for select
-    using (organization_id in (select public.fn_user_org_ids())
-           or public.fn_is_platform_admin());
+  on public.loyalty_ledger for select
+    using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
   drop policy if exists tenant_isolation_loyalty_ledger_write on public.loyalty_ledger;
-  create policy tenant_isolation_loyalty_ledger_write
-    on public.loyalty_ledger for all
-    using (organization_id in (select public.fn_user_org_ids())
-           or public.fn_is_platform_admin_full())
-    with check (
-      public.fn_is_platform_admin_full()
-      or (organization_id in (select public.fn_user_org_ids())
-          and public.fn_role_at_least(organization_id, 'agent'))
-    );
+  drop policy if exists tenant_isolation_loyalty_ledger_insert on public.loyalty_ledger;
+  create policy tenant_isolation_loyalty_ledger_insert
+  on public.loyalty_ledger for insert
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_loyalty_ledger_update on public.loyalty_ledger;
+  create policy tenant_isolation_loyalty_ledger_update
+  on public.loyalty_ledger for update
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))))
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_loyalty_ledger_delete on public.loyalty_ledger;
+  create policy tenant_isolation_loyalty_ledger_delete
+  on public.loyalty_ledger for delete
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
 
-    -- D5: a proteção na MESMA transação. Sem esta linha a tabela nasce com a anon
-    -- key podendo ler tudo — `baseline.sql:4748` dá, por
-    -- `alter default privileges`, privilégio total a `anon` no que nasce depois.
-    perform public.fn_proteger_modulo_provisionado();
+  -- Serializa o DELETE com a finalização e revalida o estado após obter lock.
+  drop trigger if exists sale_items_delete_only_open on public.sale_items;
+  create trigger sale_items_delete_only_open
+    before delete on public.sale_items
+    for each row execute function public.fn_financeiro_guard_sale_item_delete();
 
-    -- A comanda alcançada por SEÇÃO declarada (D8, migration 0485), não por passo
-    -- escrito na cascata: `notes`/`cancel_reason`/`reverse_reason` são texto da
-    -- pessoa, e a redação passou a acontecer no gatilho `trg_lgpd_secoes_de_modulo`,
-    -- nos DOIS caminhos de anonimização — sem o núcleo nomear `sales`.
-    perform public.fn_financeiro_declarar_secoes_lgpd();
+  -- D5: a proteção na MESMA transação. Sem esta linha a tabela nasce com a anon
+  -- key podendo ler tudo — `baseline.sql:4748` dá, por
+  -- `alter default privileges`, privilégio total a `anon` no que nasce depois.
+  perform public.fn_proteger_modulo_provisionado();
 
-    -- A FK do caixa, que o molde não deixa o corpo criar: sai para a rotina própria
-    -- do fim do bloco, com guarda de `to_regclass` e conferência de qualquer FK.
-    perform public.fn_financeiro_ligar_caixa_a_comanda();
-  end
+  -- ── A comanda alcançada por SEÇÃO, não por passo escrito na cascata ────────
+  -- `notes`, `cancel_reason` e `reverse_reason` são texto da pessoa, e a comanda
+  -- é alcançada por `contact_id`. O que a D8 (migration 0485) cobra é a SEÇÃO
+  -- declarada em `modulo_secoes_lgpd`: daí em diante a redação acontece no
+  -- gatilho `trg_lgpd_secoes_de_modulo`, nos DOIS caminhos de anonimização (a
+  -- cascata e a virada `is_anonymized` de `fn_lgpd_anonymize_contact`), e sem o
+  -- núcleo nomear `sales` — o `update sales set` fixo saiu da cascata por isto.
+  perform public.fn_financeiro_declarar_secoes_lgpd();
+
+  -- A FK do caixa, que o molde não deixa o corpo criar (núcleo alterando núcleo):
+  -- sai daqui para a rotina própria que a migration define no fim, com o mesmo
+  -- guarda de `to_regclass` e a conferência de qualquer FK já existente.
+  perform public.fn_financeiro_ligar_caixa_a_comanda();
+end
 $f$;
 revoke execute on function public.fn_financeiro_provisionar() from public, anon, authenticated;
 grant execute on function public.fn_financeiro_provisionar() to service_role;
@@ -43884,6 +44071,17 @@ insert into public.modulos_instalados (modulo, estado, instalado_por, reaplicado
      )
   on conflict (modulo) do nothing;
 
+-- migration 9022: reaplica políticas financeiras em módulo já provisionado.
+do $financeiro$
+begin
+  if to_regclass('public.sales') is not null
+     and to_regclass('public.sale_items') is not null
+     and exists (select 1 from public.modulos_instalados where modulo = 'financeiro') then
+    perform public.fn_financeiro_provisionar();
+  end if;
+end
+$financeiro$;
+
 -- ---- Exclusão de contato com turno de follow-up: ficha inteira (migration 0488) ----
 -- Issue #1862: a rota apagava `messages`, `conversations` e `contacts` em três
 -- chamadas separadas, e o `contacts` era recusado com 42501 pelo gatilho de
@@ -43939,17 +44137,20 @@ notify pgrst, 'reload schema';
 drop policy if exists tenant_isolation_followup_enrollments_all on public.followup_enrollments;
 
 drop policy if exists followup_enrollments_select on public.followup_enrollments;
-create policy followup_enrollments_select on public.followup_enrollments
+create policy followup_enrollments_select
+  on public.followup_enrollments
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 drop policy if exists followup_enrollments_insert on public.followup_enrollments;
-create policy followup_enrollments_insert on public.followup_enrollments
+create policy followup_enrollments_insert
+  on public.followup_enrollments
   for insert
   with check (organization_id in (select public.fn_user_org_ids())
               and public.fn_role_at_least(organization_id, 'manager'));
 
 drop policy if exists followup_enrollments_update on public.followup_enrollments;
-create policy followup_enrollments_update on public.followup_enrollments
+create policy followup_enrollments_update
+  on public.followup_enrollments
   for update
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'manager'))
@@ -43957,7 +44158,8 @@ create policy followup_enrollments_update on public.followup_enrollments
               and public.fn_role_at_least(organization_id, 'manager'));
 
 drop policy if exists followup_enrollments_delete on public.followup_enrollments;
-create policy followup_enrollments_delete on public.followup_enrollments
+create policy followup_enrollments_delete
+  on public.followup_enrollments
   for delete
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'manager'));
@@ -43965,17 +44167,20 @@ create policy followup_enrollments_delete on public.followup_enrollments
 drop policy if exists tenant_isolation_followup_flow_pointers_all on public.followup_flow_pointers;
 
 drop policy if exists followup_flow_pointers_select on public.followup_flow_pointers;
-create policy followup_flow_pointers_select on public.followup_flow_pointers
+create policy followup_flow_pointers_select
+  on public.followup_flow_pointers
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 drop policy if exists followup_flow_pointers_insert on public.followup_flow_pointers;
-create policy followup_flow_pointers_insert on public.followup_flow_pointers
+create policy followup_flow_pointers_insert
+  on public.followup_flow_pointers
   for insert
   with check (organization_id in (select public.fn_user_org_ids())
               and public.fn_role_at_least(organization_id, 'manager'));
 
 drop policy if exists followup_flow_pointers_update on public.followup_flow_pointers;
-create policy followup_flow_pointers_update on public.followup_flow_pointers
+create policy followup_flow_pointers_update
+  on public.followup_flow_pointers
   for update
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'manager'))
@@ -43983,7 +44188,8 @@ create policy followup_flow_pointers_update on public.followup_flow_pointers
               and public.fn_role_at_least(organization_id, 'manager'));
 
 drop policy if exists followup_flow_pointers_delete on public.followup_flow_pointers;
-create policy followup_flow_pointers_delete on public.followup_flow_pointers
+create policy followup_flow_pointers_delete
+  on public.followup_flow_pointers
   for delete
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'manager'));
@@ -43996,11 +44202,13 @@ create policy followup_flow_pointers_delete on public.followup_flow_pointers
 drop policy if exists tenant_isolation_followup_enrollment_events_all on public.followup_enrollment_events;
 
 drop policy if exists followup_enrollment_events_select on public.followup_enrollment_events;
-create policy followup_enrollment_events_select on public.followup_enrollment_events
+create policy followup_enrollment_events_select
+  on public.followup_enrollment_events
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 drop policy if exists followup_enrollment_events_insert on public.followup_enrollment_events;
-create policy followup_enrollment_events_insert on public.followup_enrollment_events
+create policy followup_enrollment_events_insert
+  on public.followup_enrollment_events
   for insert
   with check (organization_id in (select public.fn_user_org_ids())
               and public.fn_role_at_least(organization_id, 'manager'));
@@ -44008,11 +44216,13 @@ create policy followup_enrollment_events_insert on public.followup_enrollment_ev
 drop policy if exists tenant_isolation_followup_flow_versions_all on public.followup_flow_versions;
 
 drop policy if exists followup_flow_versions_select on public.followup_flow_versions;
-create policy followup_flow_versions_select on public.followup_flow_versions
+create policy followup_flow_versions_select
+  on public.followup_flow_versions
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 drop policy if exists followup_flow_versions_delete on public.followup_flow_versions;
-create policy followup_flow_versions_delete on public.followup_flow_versions
+create policy followup_flow_versions_delete
+  on public.followup_flow_versions
   for delete
   using (organization_id in (select public.fn_user_org_ids())
          and public.fn_role_at_least(organization_id, 'manager'));
@@ -45915,7 +46125,8 @@ create index if not exists jev_router_decisions_org_created_idx
 
 alter table public.jev_router_decisions enable row level security;
 drop policy if exists tenant_isolation_jev_router_decisions_select on public.jev_router_decisions;
-create policy tenant_isolation_jev_router_decisions_select on public.jev_router_decisions
+create policy tenant_isolation_jev_router_decisions_select
+  on public.jev_router_decisions
   for select using (organization_id in (select public.fn_user_org_ids()));
 revoke all on public.jev_router_decisions from public, anon, authenticated;
 grant select on public.jev_router_decisions to authenticated;
@@ -47724,7 +47935,8 @@ create unique index if not exists cobranca_assinaturas_cliente
 
 alter table public.cobranca_assinaturas enable row level security;
 drop policy if exists tenant_isolation_cobranca_assinaturas_select on public.cobranca_assinaturas;
-create policy tenant_isolation_cobranca_assinaturas_select on public.cobranca_assinaturas
+create policy tenant_isolation_cobranca_assinaturas_select
+  on public.cobranca_assinaturas
   for select to authenticated using (public.fn_role_at_least(organization_id, 'admin'));
 revoke all on public.cobranca_assinaturas from anon, authenticated;
 grant select on public.cobranca_assinaturas to authenticated;
@@ -50897,7 +51109,8 @@ create index if not exists channel_schedules_vivas_idx
 
 alter table public.channel_schedules enable row level security;
 drop policy if exists tenant_isolation_channel_schedules_select on public.channel_schedules;
-create policy tenant_isolation_channel_schedules_select on public.channel_schedules
+create policy tenant_isolation_channel_schedules_select
+  on public.channel_schedules
   for select using (organization_id in (select public.fn_user_org_ids()));
 revoke all on public.channel_schedules from public, anon, authenticated;
 grant select on public.channel_schedules to authenticated;
@@ -54919,7 +55132,8 @@ grant execute on function public.fn_can_view_task(uuid, uuid, uuid)
 -- ─── calendar_appointments: leitura e escrita pelo dono do compromisso ──────
 
 drop policy if exists calendar_appointments_select on public.calendar_appointments;
-create policy calendar_appointments_select on public.calendar_appointments
+create policy calendar_appointments_select
+  on public.calendar_appointments
   for select using (
     public.fn_can_view_appointment(organization_id, owner_user_id)
     -- A OPÇÃO da #978, dentro do pertencimento (ver COLISÃO DECLARADA acima):
@@ -54931,7 +55145,8 @@ create policy calendar_appointments_select on public.calendar_appointments
   );
 
 drop policy if exists calendar_appointments_write on public.calendar_appointments;
-create policy calendar_appointments_write on public.calendar_appointments
+create policy calendar_appointments_write
+  on public.calendar_appointments
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -54952,7 +55167,8 @@ create policy calendar_appointments_write on public.calendar_appointments
 -- ─── crm_tasks: leitura e escrita pelo responsável (e por quem criou) ───────
 
 drop policy if exists crm_tasks_select on public.crm_tasks;
-create policy crm_tasks_select on public.crm_tasks
+create policy crm_tasks_select
+  on public.crm_tasks
   for select using (
     public.fn_can_view_task(organization_id, assigned_to, created_by)
     -- Mesma opção, mesma colocação da irmã da agenda: o recorte por responsável
@@ -54962,7 +55178,8 @@ create policy crm_tasks_select on public.crm_tasks
   );
 
 drop policy if exists crm_tasks_write on public.crm_tasks;
-create policy crm_tasks_write on public.crm_tasks
+create policy crm_tasks_write
+  on public.crm_tasks
   using (
     public.fn_is_platform_admin_full()
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -55414,11 +55631,13 @@ alter table public.ai_agent_version_channels enable row level security;
 drop policy if exists tenant_isolation_ai_agent_version_channels_all on public.ai_agent_version_channels;
 
 drop policy if exists tenant_isolation_ai_agent_version_channels_select on public.ai_agent_version_channels;
-create policy tenant_isolation_ai_agent_version_channels_select on public.ai_agent_version_channels
+create policy tenant_isolation_ai_agent_version_channels_select
+  on public.ai_agent_version_channels
   for select using (organization_id in (select * from public.fn_user_org_ids()));
 
 drop policy if exists tenant_isolation_ai_agent_version_channels_write on public.ai_agent_version_channels;
-create policy tenant_isolation_ai_agent_version_channels_write on public.ai_agent_version_channels
+create policy tenant_isolation_ai_agent_version_channels_write
+  on public.ai_agent_version_channels
   for all using (
     organization_id in (select * from public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin')
@@ -56076,7 +56295,8 @@ grant  execute on function public.fn_evento_visivel_ao_atendente(uuid, text, uui
 do $$
 begin
   drop policy if exists "event_log_select" on public.event_log;
-  create policy "event_log_select" on public.event_log
+  create policy "event_log_select"
+  on public.event_log
     for select using (
       organization_id in (
         select o from public.fn_user_org_ids() o
@@ -56446,7 +56666,8 @@ alter table public.automation_rodizio_atribuicoes enable row level security;
 
 -- Leitura por quem é da organização; ninguém grava pela API (só a função).
 drop policy if exists tenant_isolation_automation_rodizio_atribuicoes_select on public.automation_rodizio_atribuicoes;
-create policy tenant_isolation_automation_rodizio_atribuicoes_select on public.automation_rodizio_atribuicoes
+create policy tenant_isolation_automation_rodizio_atribuicoes_select
+  on public.automation_rodizio_atribuicoes
   for select using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
 
 revoke all on public.automation_rodizio_atribuicoes from anon, authenticated;
@@ -56963,7 +57184,8 @@ create index if not exists importacoes_de_historico_org_idx
 
 alter table public.importacoes_de_historico enable row level security;
 drop policy if exists tenant_isolation_importacoes_de_historico_select on public.importacoes_de_historico;
-create policy tenant_isolation_importacoes_de_historico_select on public.importacoes_de_historico
+create policy tenant_isolation_importacoes_de_historico_select
+  on public.importacoes_de_historico
   for select using (organization_id in (select public.fn_user_org_ids()));
 revoke all on public.importacoes_de_historico from public, anon, authenticated;
 grant select on public.importacoes_de_historico to authenticated;
@@ -57255,13 +57477,16 @@ end $$;
 -- As reservas novas são escritas pelas portas nativas security definer. Uma
 -- escrita direta pela sessão não pode travar a linha antes da trava de estoque.
 drop policy if exists service_appointments_native_insert on public.calendar_appointments;
-create policy service_appointments_native_insert on public.calendar_appointments as restrictive for insert to authenticated
+create policy service_appointments_native_insert
+  on public.calendar_appointments as restrictive for insert to authenticated
  with check (service_occurrence_id is null and not service_block);
 drop policy if exists service_appointments_native_update on public.calendar_appointments;
-create policy service_appointments_native_update on public.calendar_appointments as restrictive for update to authenticated
+create policy service_appointments_native_update
+  on public.calendar_appointments as restrictive for update to authenticated
  using (service_occurrence_id is null and not service_block) with check (service_occurrence_id is null and not service_block);
 drop policy if exists service_appointments_native_delete on public.calendar_appointments;
-create policy service_appointments_native_delete on public.calendar_appointments as restrictive for delete to authenticated
+create policy service_appointments_native_delete
+  on public.calendar_appointments as restrictive for delete to authenticated
  using (service_occurrence_id is null and not service_block);
 do $$ declare tab text; begin
   foreach tab in array array['calendar_service_schedule','calendar_service_professionals','calendar_resources','calendar_service_resources',
@@ -60328,7 +60553,8 @@ create trigger trg_crm_lead_attachments_caminho_imutavel
 drop policy if exists tenant_isolation_crm_lead_attachments_all on public.crm_lead_attachments;
 drop policy if exists crm_lead_attachments_tenant_isolate on public.crm_lead_attachments;
 drop policy if exists tenant_isolation_crm_lead_attachments_select on public.crm_lead_attachments;
-create policy tenant_isolation_crm_lead_attachments_select on public.crm_lead_attachments
+create policy tenant_isolation_crm_lead_attachments_select
+  on public.crm_lead_attachments
   for select to authenticated
   using (
     organization_id in (select public.fn_user_org_ids())
@@ -60340,7 +60566,8 @@ create policy tenant_isolation_crm_lead_attachments_select on public.crm_lead_at
   );
 
 drop policy if exists tenant_isolation_crm_lead_attachments_write on public.crm_lead_attachments;
-create policy tenant_isolation_crm_lead_attachments_write on public.crm_lead_attachments
+create policy tenant_isolation_crm_lead_attachments_write
+  on public.crm_lead_attachments
   for all to authenticated
   using (
     organization_id in (select public.fn_user_org_ids())
@@ -60690,7 +60917,8 @@ do $conversations_select$ begin
   -- tests/invariants/escopo-da-conversa-avaliado-uma-vez.test.ts (#2848 sobre o
   -- conserto #3090). A política abaixo é a da main (58213) + o ramo participante.
   drop policy if exists "conversations_select" on public.conversations;
-  create policy "conversations_select" on public.conversations
+  create policy "conversations_select"
+  on public.conversations
     for select using (
       (select public.fn_is_platform_admin())
       or organization_id in (
@@ -61772,7 +62000,8 @@ alter table public.agent_turn_traces enable row level security;
 
 drop policy if exists tenant_isolation_agent_turn_traces_all on public.agent_turn_traces;
 drop policy if exists tenant_isolation_agent_turn_traces_select on public.agent_turn_traces;
-create policy tenant_isolation_agent_turn_traces_select on public.agent_turn_traces
+create policy tenant_isolation_agent_turn_traces_select
+  on public.agent_turn_traces
   for select using (organization_id in (select public.fn_user_org_ids()));
 
 revoke all on public.agent_turn_traces from anon, authenticated;
@@ -62716,7 +62945,8 @@ create index if not exists external_db_connections_org_idx
 alter table public.external_db_connections enable row level security;
 
 drop policy if exists tenant_isolation_external_db_connections_select on public.external_db_connections;
-create policy tenant_isolation_external_db_connections_select on public.external_db_connections
+create policy tenant_isolation_external_db_connections_select
+  on public.external_db_connections
   for select
   using (organization_id in (select * from public.fn_user_org_ids()));
 
@@ -62724,7 +62954,8 @@ create policy tenant_isolation_external_db_connections_select on public.external
 -- na camada que sobrevive a uma rota nova.
 drop policy if exists tenant_isolation_external_db_connections_modify on public.external_db_connections;
 drop policy if exists tenant_isolation_external_db_connections_write on public.external_db_connections;
-create policy tenant_isolation_external_db_connections_write on public.external_db_connections
+create policy tenant_isolation_external_db_connections_write
+  on public.external_db_connections
   for all
   using (
     organization_id in (select * from public.fn_user_org_ids())
@@ -62888,13 +63119,15 @@ create index if not exists crm_metas_org_periodo_idx
 alter table public.crm_metas enable row level security;
 
 drop policy if exists crm_metas_select on public.crm_metas;
-create policy crm_metas_select on public.crm_metas
+create policy crm_metas_select
+  on public.crm_metas
   for select using (
     (organization_id in (select public.fn_user_org_ids())) or (select public.fn_is_platform_admin())
   );
 
 drop policy if exists crm_metas_insert on public.crm_metas;
-create policy crm_metas_insert on public.crm_metas
+create policy crm_metas_insert
+  on public.crm_metas
   for insert with check (
     (select public.fn_is_platform_admin_full())
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -62902,7 +63135,8 @@ create policy crm_metas_insert on public.crm_metas
   );
 
 drop policy if exists crm_metas_write on public.crm_metas;
-create policy crm_metas_write on public.crm_metas
+create policy crm_metas_write
+  on public.crm_metas
   for update using (
     (select public.fn_is_platform_admin_full())
     or ((organization_id in (select public.fn_user_org_ids()))
@@ -63076,7 +63310,8 @@ revoke all on public.lead_field_proposals from anon;
 -- MESMO nome, como a 0731: policies permissivas somam (OR), e uma esquecida
 -- reabriria o que as novas fecham.
 drop policy if exists tenant_isolation_lead_field_proposals_select on public.lead_field_proposals;
-create policy tenant_isolation_lead_field_proposals_select on public.lead_field_proposals
+create policy tenant_isolation_lead_field_proposals_select
+  on public.lead_field_proposals
   for select to authenticated
   using (
     organization_id in (select public.fn_user_org_ids())
@@ -63119,77 +63354,77 @@ do $f$ begin perform public.fn_proteger_tabelas_de_organizacao(); end $f$;
 -- as policies na forma antiga. Leitura (`for select`) CONTINUA com `fn_is_platform_admin()`
 -- — support_readonly segue lendo, só não escreve mais.
 
-drop policy if exists "api_tokens_admin_only" on "public"."api_tokens";
-drop policy if exists "api_tokens_tenant_read" on "public"."api_tokens";
-create policy "api_tokens_tenant_read" on "public"."api_tokens" for select using (public.fn_role_at_least("organization_id",'admin') or public.fn_is_platform_admin());
-drop policy if exists "api_tokens_admin_write" on "public"."api_tokens";
-create policy "api_tokens_admin_write" on "public"."api_tokens" for all using (public.fn_role_at_least("organization_id",'admin') or public.fn_is_platform_admin_full()) with check (public.fn_role_at_least("organization_id",'admin') or public.fn_is_platform_admin_full());
+drop policy if exists "api_tokens_admin_only" on public.api_tokens;
+drop policy if exists "api_tokens_tenant_read" on public.api_tokens;
+create policy "api_tokens_tenant_read" on public.api_tokens for select using (public.fn_role_at_least("organization_id",'admin') or public.fn_is_platform_admin());
+drop policy if exists "api_tokens_admin_write" on public.api_tokens;
+create policy "api_tokens_admin_write" on public.api_tokens for all using (public.fn_role_at_least("organization_id",'admin') or public.fn_is_platform_admin_full()) with check (public.fn_role_at_least("organization_id",'admin') or public.fn_is_platform_admin_full());
 
-drop policy if exists "nuvemshop_products_tenant" on "public"."nuvemshop_products";
-drop policy if exists "nuvemshop_products_read" on "public"."nuvemshop_products";
-create policy "nuvemshop_products_read" on "public"."nuvemshop_products" for select using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
-drop policy if exists "nuvemshop_products_tenant_write" on "public"."nuvemshop_products";
-create policy "nuvemshop_products_tenant_write" on "public"."nuvemshop_products" for all using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full()) with check ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full());
+drop policy if exists "nuvemshop_products_tenant" on public.nuvemshop_products;
+drop policy if exists "nuvemshop_products_read" on public.nuvemshop_products;
+create policy "nuvemshop_products_read" on public.nuvemshop_products for select using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
+drop policy if exists "nuvemshop_products_tenant_write" on public.nuvemshop_products;
+create policy "nuvemshop_products_tenant_write" on public.nuvemshop_products for all using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full()) with check ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full());
 
-drop policy if exists "platform_admin_only_incidents" on "public"."incidents";
-drop policy if exists "incidents_tenant_read" on "public"."incidents";
-create policy "incidents_tenant_read" on "public"."incidents" for select using (public.fn_is_platform_admin());
-drop policy if exists "incidents_admin_write" on "public"."incidents";
-create policy "incidents_admin_write" on "public"."incidents" for all using (public.fn_is_platform_admin_full()) with check (public.fn_is_platform_admin_full());
+drop policy if exists "platform_admin_only_incidents" on public.incidents;
+drop policy if exists "incidents_tenant_read" on public.incidents;
+create policy "incidents_tenant_read" on public.incidents for select using (public.fn_is_platform_admin());
+drop policy if exists "incidents_admin_write" on public.incidents;
+create policy "incidents_admin_write" on public.incidents for all using (public.fn_is_platform_admin_full()) with check (public.fn_is_platform_admin_full());
 
-drop policy if exists "tenant_isolation_ai_invocations_all" on "public"."ai_invocations";
-drop policy if exists "tenant_isolation_ai_invocations_read" on "public"."ai_invocations";
-create policy "tenant_isolation_ai_invocations_read" on "public"."ai_invocations" for select using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
-drop policy if exists "tenant_isolation_ai_invocations_write" on "public"."ai_invocations";
-create policy "tenant_isolation_ai_invocations_write" on "public"."ai_invocations" for all using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full()) with check ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full());
+drop policy if exists "tenant_isolation_ai_invocations_all" on public.ai_invocations;
+drop policy if exists "tenant_isolation_ai_invocations_read" on public.ai_invocations;
+create policy "tenant_isolation_ai_invocations_read" on public.ai_invocations for select using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
+drop policy if exists "tenant_isolation_ai_invocations_write" on public.ai_invocations;
+create policy "tenant_isolation_ai_invocations_write" on public.ai_invocations for all using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full()) with check ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full());
 
-drop policy if exists "tenant_isolation_contacts_all" on "public"."contacts";
-drop policy if exists "tenant_isolation_contacts_read" on "public"."contacts";
-create policy "tenant_isolation_contacts_read" on "public"."contacts" for select using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
-drop policy if exists "tenant_isolation_contacts_write" on "public"."contacts";
-create policy "tenant_isolation_contacts_write" on "public"."contacts" for all using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full()) with check ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full());
+drop policy if exists "tenant_isolation_contacts_all" on public.contacts;
+drop policy if exists "tenant_isolation_contacts_read" on public.contacts;
+create policy "tenant_isolation_contacts_read" on public.contacts for select using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
+drop policy if exists "tenant_isolation_contacts_write" on public.contacts;
+create policy "tenant_isolation_contacts_write" on public.contacts for all using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full()) with check ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full());
 
-drop policy if exists "warmup_tenant_isolation_all" on "public"."channel_session_warmup";
-drop policy if exists "warmup_tenant_isolation_read" on "public"."channel_session_warmup";
-create policy "warmup_tenant_isolation_read" on "public"."channel_session_warmup" for select using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
-drop policy if exists "warmup_tenant_isolation_write" on "public"."channel_session_warmup";
-create policy "warmup_tenant_isolation_write" on "public"."channel_session_warmup" for all using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full()) with check ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full());
+drop policy if exists "warmup_tenant_isolation_all" on public.channel_session_warmup;
+drop policy if exists "warmup_tenant_isolation_read" on public.channel_session_warmup;
+create policy "warmup_tenant_isolation_read" on public.channel_session_warmup for select using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
+drop policy if exists "warmup_tenant_isolation_write" on public.channel_session_warmup;
+create policy "warmup_tenant_isolation_write" on public.channel_session_warmup for all using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full()) with check ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full());
 
-drop policy if exists "orgs_write_platform_admin" on "public"."organizations";
-drop policy if exists "orgs_write_platform_admin" on "public"."organizations";
-create policy "orgs_write_platform_admin" on "public"."organizations" for all using (public.fn_is_platform_admin_full()) with check (public.fn_is_platform_admin_full());
+drop policy if exists "orgs_write_platform_admin" on public.organizations;
+drop policy if exists "orgs_write_platform_admin" on public.organizations;
+create policy "orgs_write_platform_admin" on public.organizations for all using (public.fn_is_platform_admin_full()) with check (public.fn_is_platform_admin_full());
 
-drop policy if exists "audit_log_insert_tenant_member" on "public"."api_audit_log";
-drop policy if exists "audit_log_insert_tenant_member" on "public"."api_audit_log";
-create policy "audit_log_insert_tenant_member" on "public"."api_audit_log" for insert to authenticated with check ((("organization_id" is null) or ("organization_id" in (select public.fn_user_org_ids())) or public.fn_is_platform_admin_full()));
+drop policy if exists "audit_log_insert_tenant_member" on public.api_audit_log;
+drop policy if exists "audit_log_insert_tenant_member" on public.api_audit_log;
+create policy "audit_log_insert_tenant_member" on public.api_audit_log for insert to authenticated with check ((("organization_id" is null) or ("organization_id" in (select public.fn_user_org_ids())) or public.fn_is_platform_admin_full()));
 
-drop policy if exists "lgpd_requests_admin_write" on "public"."lgpd_requests";
-drop policy if exists "lgpd_requests_admin_write" on "public"."lgpd_requests";
-create policy "lgpd_requests_admin_write" on "public"."lgpd_requests" for all using (public.fn_is_platform_admin_full() or ("organization_id" in (select public.fn_user_org_ids()) and public.fn_role_at_least("organization_id",'admin'))) with check (public.fn_is_platform_admin_full() or ("organization_id" in (select public.fn_user_org_ids()) and public.fn_role_at_least("organization_id",'admin')));
+drop policy if exists "lgpd_requests_admin_write" on public.lgpd_requests;
+drop policy if exists "lgpd_requests_admin_write" on public.lgpd_requests;
+create policy "lgpd_requests_admin_write" on public.lgpd_requests for all using (public.fn_is_platform_admin_full() or ("organization_id" in (select public.fn_user_org_ids()) and public.fn_role_at_least("organization_id",'admin'))) with check (public.fn_is_platform_admin_full() or ("organization_id" in (select public.fn_user_org_ids()) and public.fn_role_at_least("organization_id",'admin')));
 
-drop policy if exists "merge_queue_manager_write" on "public"."merge_queue";
-drop policy if exists "merge_queue_manager_write" on "public"."merge_queue";
-create policy "merge_queue_manager_write" on "public"."merge_queue" for all using (public.fn_is_platform_admin_full() or ("organization_id" in (select public.fn_user_org_ids()) and public.fn_role_at_least("organization_id",'manager'))) with check (public.fn_is_platform_admin_full() or ("organization_id" in (select public.fn_user_org_ids()) and public.fn_role_at_least("organization_id",'manager')));
+drop policy if exists "merge_queue_manager_write" on public.merge_queue;
+drop policy if exists "merge_queue_manager_write" on public.merge_queue;
+create policy "merge_queue_manager_write" on public.merge_queue for all using (public.fn_is_platform_admin_full() or ("organization_id" in (select public.fn_user_org_ids()) and public.fn_role_at_least("organization_id",'manager'))) with check (public.fn_is_platform_admin_full() or ("organization_id" in (select public.fn_user_org_ids()) and public.fn_role_at_least("organization_id",'manager')));
 
-drop policy if exists "tenant_integrations_admin_write" on "public"."tenant_integrations";
-drop policy if exists "tenant_integrations_admin_write" on "public"."tenant_integrations";
-create policy "tenant_integrations_admin_write" on "public"."tenant_integrations" for all using (public.fn_is_platform_admin_full() or ("organization_id" in (select public.fn_user_org_ids()) and public.fn_role_at_least("organization_id",'manager'))) with check (public.fn_is_platform_admin_full() or ("organization_id" in (select public.fn_user_org_ids()) and public.fn_role_at_least("organization_id",'manager')));
+drop policy if exists "tenant_integrations_admin_write" on public.tenant_integrations;
+drop policy if exists "tenant_integrations_admin_write" on public.tenant_integrations;
+create policy "tenant_integrations_admin_write" on public.tenant_integrations for all using (public.fn_is_platform_admin_full() or ("organization_id" in (select public.fn_user_org_ids()) and public.fn_role_at_least("organization_id",'manager'))) with check (public.fn_is_platform_admin_full() or ("organization_id" in (select public.fn_user_org_ids()) and public.fn_role_at_least("organization_id",'manager')));
 
-drop policy if exists "orders_tenant_write" on "public"."orders";
-drop policy if exists "orders_tenant_write" on "public"."orders";
-create policy "orders_tenant_write" on "public"."orders" for all using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full()) with check ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full());
+drop policy if exists "orders_tenant_write" on public.orders;
+drop policy if exists "orders_tenant_write" on public.orders;
+create policy "orders_tenant_write" on public.orders for all using ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full()) with check ("organization_id" in (select public.fn_user_org_ids()) or public.fn_is_platform_admin_full());
 
-drop policy if exists "user_orgs_delete" on "public"."user_organizations";
-drop policy if exists "user_orgs_delete" on "public"."user_organizations";
-create policy "user_orgs_delete" on "public"."user_organizations" for delete using (public.fn_role_at_least("organization_id",'admin') or public.fn_is_platform_admin_full());
+drop policy if exists "user_orgs_delete" on public.user_organizations;
+drop policy if exists "user_orgs_delete" on public.user_organizations;
+create policy "user_orgs_delete" on public.user_organizations for delete using (public.fn_role_at_least("organization_id",'admin') or public.fn_is_platform_admin_full());
 
-drop policy if exists "user_orgs_insert" on "public"."user_organizations";
-drop policy if exists "user_orgs_insert" on "public"."user_organizations";
-create policy "user_orgs_insert" on "public"."user_organizations" for insert with check (public.fn_role_at_least("organization_id",'admin') or public.fn_is_platform_admin_full());
+drop policy if exists "user_orgs_insert" on public.user_organizations;
+drop policy if exists "user_orgs_insert" on public.user_organizations;
+create policy "user_orgs_insert" on public.user_organizations for insert with check (public.fn_role_at_least("organization_id",'admin') or public.fn_is_platform_admin_full());
 
-drop policy if exists "user_orgs_update" on "public"."user_organizations";
-drop policy if exists "user_orgs_update" on "public"."user_organizations";
-create policy "user_orgs_update" on "public"."user_organizations" for update using (public.fn_role_at_least("organization_id",'admin') or public.fn_is_platform_admin_full());
+drop policy if exists "user_orgs_update" on public.user_organizations;
+drop policy if exists "user_orgs_update" on public.user_organizations;
+create policy "user_orgs_update" on public.user_organizations for update using (public.fn_role_at_least("organization_id",'admin') or public.fn_is_platform_admin_full());
 
 -- ---- grants da função nova (espelha o bloco da fn_is_platform_admin) ----
 revoke execute on function public.fn_is_platform_admin_full() from public, anon;
@@ -63572,7 +63807,8 @@ comment on table public.conversation_notes is
 -- atendente que não abria a conversa lia as notas dela, e quem perdeu a
 -- conversa continuava vendo. Molde: `tenant_isolation_ai_reply_drafts_all`.
 drop policy if exists "conversation_notes_select" on public.conversation_notes;
-create policy "conversation_notes_select" on public.conversation_notes
+create policy "conversation_notes_select"
+  on public.conversation_notes
   for select using (
     organization_id in (select public.fn_user_org_ids())
     and exists (
@@ -63595,7 +63831,8 @@ create policy "conversation_notes_select" on public.conversation_notes
 -- rota DELETE, que já era autor+/manager+ no app.
 drop policy if exists "conversation_notes_write" on public.conversation_notes;
 drop policy if exists "conversation_notes_insert" on public.conversation_notes;
-create policy "conversation_notes_insert" on public.conversation_notes
+create policy "conversation_notes_insert"
+  on public.conversation_notes
   for insert
   with check (
     organization_id in (select public.fn_user_org_ids())
@@ -63610,7 +63847,8 @@ create policy "conversation_notes_insert" on public.conversation_notes
   );
 
 drop policy if exists "conversation_notes_update" on public.conversation_notes;
-create policy "conversation_notes_update" on public.conversation_notes
+create policy "conversation_notes_update"
+  on public.conversation_notes
   for update
   using (
     organization_id in (select public.fn_user_org_ids())
@@ -63636,7 +63874,8 @@ create policy "conversation_notes_update" on public.conversation_notes
   );
 
 drop policy if exists "conversation_notes_delete" on public.conversation_notes;
-create policy "conversation_notes_delete" on public.conversation_notes
+create policy "conversation_notes_delete"
+  on public.conversation_notes
   for delete
   using (
     organization_id in (select public.fn_user_org_ids())
@@ -63653,7 +63892,8 @@ create policy "conversation_notes_delete" on public.conversation_notes
 -- O ramo `or fn_is_platform_admin()` da política antiga vira policy própria:
 -- o admin de plataforma não é membro de organização nenhuma por definição.
 drop policy if exists "conversation_notes_select_platform_admin" on public.conversation_notes;
-create policy "conversation_notes_select_platform_admin" on public.conversation_notes
+create policy "conversation_notes_select_platform_admin"
+  on public.conversation_notes
   for select using (public.fn_is_platform_admin());
 -- ---- busca humana na telemetria: author_kind (migration 0484) ----
 -- 0484 — a busca HUMANA do acervo entra na telemetria (F2 da #1869).
@@ -65445,13 +65685,15 @@ drop policy if exists channel_sessions_tenant_insert on public.channel_sessions;
 drop policy if exists channel_sessions_tenant_update on public.channel_sessions;
 drop policy if exists channel_sessions_tenant_delete on public.channel_sessions;
 
-create policy channel_sessions_tenant_insert on public.channel_sessions
+create policy channel_sessions_tenant_insert
+  on public.channel_sessions
   for insert with check (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
     or public.fn_is_platform_admin_full()
   );
-create policy channel_sessions_tenant_update on public.channel_sessions
+create policy channel_sessions_tenant_update
+  on public.channel_sessions
   for update using (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
@@ -65461,7 +65703,8 @@ create policy channel_sessions_tenant_update on public.channel_sessions
       and public.fn_role_at_least(organization_id, 'admin'))
     or public.fn_is_platform_admin_full()
   );
-create policy channel_sessions_tenant_delete on public.channel_sessions
+create policy channel_sessions_tenant_delete
+  on public.channel_sessions
   for delete using (
     (organization_id in (select public.fn_user_org_ids())
       and public.fn_role_at_least(organization_id, 'admin'))
@@ -65546,7 +65789,8 @@ comment on index public.idx_crm_leads_org_pipeline_position_id is
 -- porque a FK simples só conhece o id e o WITH CHECK omitia o vínculo que o
 -- USING já cobra. A MESMA régua passa a valer para a linha nova também.
 drop policy if exists tenant_isolation_lead_field_proposals_write on public.lead_field_proposals;
-create policy tenant_isolation_lead_field_proposals_write on public.lead_field_proposals
+create policy tenant_isolation_lead_field_proposals_write
+  on public.lead_field_proposals
   for all to authenticated
   using (
     organization_id in (select public.fn_user_org_ids())
@@ -65597,3 +65841,670 @@ update public.lead_field_proposals p
           and vinculo.target_kind = 'contact'
      )
    );
+
+
+-- ---- guardas_comandas (migration 9023) ----
+-- manifest: Protege comandas contra exclusão e revalida a remoção de itens sob bloqueio.
+
+create or replace function public.fn_financeiro_guard_sale_item_delete()
+returns trigger
+language plpgsql
+set search_path = ''
+as $guard$
+declare
+  v_status text;
+begin
+  select s.status
+    into v_status
+    from public.sales s
+   where s.id = old.sale_id
+     and s.organization_id = old.organization_id
+   for update;
+
+  if not found or v_status <> 'open' then
+    raise exception using
+      errcode = '42501',
+      message = 'sale_item_delete_requires_open_sale';
+  end if;
+
+  return old;
+end
+$guard$;
+
+create or replace function public.fn_financeiro_guard_sale_delete()
+returns trigger
+language plpgsql
+set search_path = ''
+as $guard$
+begin
+  raise exception using
+    errcode = '42501',
+    message = 'sale_delete_forbidden';
+end
+$guard$;
+
+revoke execute on function public.fn_financeiro_guard_sale_item_delete(),
+  public.fn_financeiro_guard_sale_delete() from public, anon, authenticated, service_role;
+
+create or replace function public.fn_financeiro_instalar_guardas_comanda()
+returns void
+language plpgsql
+set search_path = ''
+as $guardas$
+declare
+  comandas regclass := pg_catalog.to_regclass('public.sales');
+  itens regclass := pg_catalog.to_regclass('public.sale_items');
+begin
+  if comandas is null and itens is null then
+    return;
+  end if;
+  if comandas is null or itens is null then
+    raise exception 'schema de comandas incompleto';
+  end if;
+
+  drop trigger if exists sales_delete_only_open on public.sales;
+  create trigger sales_delete_only_open before delete on public.sales
+    for each row execute function public.fn_financeiro_guard_sale_delete();
+  drop trigger if exists sale_items_delete_only_open on public.sale_items;
+  create trigger sale_items_delete_only_open before delete on public.sale_items
+    for each row execute function public.fn_financeiro_guard_sale_item_delete();
+end;
+$guardas$;
+revoke execute on function public.fn_financeiro_instalar_guardas_comanda()
+  from public, anon, authenticated, service_role;
+
+-- Corpo da provisionadora 9022. A instalação das guardas fica no helper comum.
+create or replace function public.fn_financeiro_provisionar()
+returns void
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $f$
+begin
+-- ─── a comanda ───────────────────────────────────────────────────────────────
+create table if not exists public.sales (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+
+  -- Número visível, por organização. `bigint` e não `serial`: a sequência é
+  -- própria de cada tenant (ver `fn_proximo_numero_de_comanda`), e um serial
+  -- global vazaria o volume de um cliente para outro.
+  number bigint not null,
+
+  contact_id uuid references public.contacts(id) on delete set null,
+  -- Quem atendeu. `set null` porque a pessoa pode sair da equipe e a venda
+  -- continua tendo acontecido.
+  attendant_user_id uuid references auth.users(id) on delete set null,
+  appointment_id uuid references public.calendar_appointments(id) on delete set null,
+
+  status text not null default 'open'
+    check (status in ('open', 'finalized', 'cancelled')),
+
+  -- Desconto da COMANDA, separado do desconto de item. Fidelidade e comissão
+  -- incidem sobre o item, nunca sobre este — senão um desconto de caixa
+  -- reduziria o prêmio de quem atendeu.
+  discount_cents bigint not null default 0 check (discount_cents >= 0),
+  total_cents bigint not null default 0,
+  currency text not null default 'BRL' check (char_length(currency) = 3),
+
+  payment_method_id uuid references public.payment_methods(id) on delete restrict,
+
+  notes text,
+  finalized_at timestamptz,
+  cancelled_at timestamptz,
+  cancel_reason text,
+  -- Estornada: a comanda continua finalizada e ganha o contra-lançamento.
+  reversed_at timestamptz,
+  reverse_reason text,
+
+  created_by_user_id uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+
+  -- Finalizar exige forma de pagamento: é ela que diz em que conta o dinheiro
+  -- cai. Sem isso, a entrada não teria destino — e o CHECK diz isso no schema,
+  -- não numa validação que alguém pode esquecer de chamar.
+  constraint sales_finalizada_tem_forma
+    check (status <> 'finalized' or payment_method_id is not null)
+);
+
+create unique index if not exists sales_org_numero_key on public.sales (organization_id, number);
+create index if not exists sales_org_status_idx on public.sales (organization_id, status, created_at desc);
+create index if not exists sales_org_contato_idx on public.sales (organization_id, contact_id);
+create index if not exists sales_appointment_idx on public.sales (appointment_id)
+  where appointment_id is not null;
+
+-- ─── o item ──────────────────────────────────────────────────────────────────
+create table if not exists public.sale_items (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  -- `cascade` aqui e só aqui: item não existe fora da comanda, e comanda não é
+  -- apagada (cancela). O cascade só dispara se a ORGANIZAÇÃO inteira sair.
+  sale_id uuid not null references public.sales(id) on delete cascade,
+
+  -- O que foi feito. `event_type_id` porque, neste produto, o catálogo de
+  -- serviços JÁ é `calendar_event_types` — criar uma tabela de serviços ao lado
+  -- seria a segunda fonte da mesma verdade.
+  event_type_id uuid references public.calendar_event_types(id) on delete restrict,
+  -- Congelado na inclusão: o nome muda, a linha da venda não.
+  description text not null,
+
+  attendant_user_id uuid references auth.users(id) on delete set null,
+
+  quantity integer not null default 1 check (quantity > 0),
+  unit_price_cents bigint not null check (unit_price_cents >= 0),
+  discount_cents bigint not null default 0 check (discount_cents >= 0),
+  total_cents bigint not null,
+
+  -- ⚠️ RESOLVIDA NA INCLUSÃO e gravada aqui. A finalização não recalcula:
+  -- mudar a regra amanhã não mexe no que já foi combinado ontem.
+  commission_percent numeric(5, 2) not null default 0
+    check (commission_percent >= 0 and commission_percent <= 100),
+
+  created_at timestamptz not null default now()
+);
+
+create index if not exists sale_items_sale_idx on public.sale_items (sale_id);
+create index if not exists sale_items_org_idx on public.sale_items (organization_id, created_at desc);
+
+-- ─── a regra de comissão ─────────────────────────────────────────────────────
+--
+-- Precedência: (pessoa + serviço) → (pessoa) → (serviço). A mais específica
+-- vence, e é por isso que as três colunas são nullable com um índice único por
+-- combinação — não há linha "curinga" mágica, há ausência.
+create table if not exists public.commission_rules (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+
+  attendant_user_id uuid references auth.users(id) on delete cascade,
+  event_type_id uuid references public.calendar_event_types(id) on delete cascade,
+
+  percent numeric(5, 2) not null check (percent >= 0 and percent <= 100),
+
+  created_at timestamptz not null default now(),
+
+  -- Pelo menos um dos dois: uma regra sem pessoa E sem serviço seria a regra
+  -- "de tudo", que é o default da organização e mora em outro lugar.
+  constraint commission_rules_tem_alvo
+    check (attendant_user_id is not null or event_type_id is not null)
+);
+
+-- `coalesce` no índice: NULL não colide com NULL numa UNIQUE, e sem isto duas
+-- regras "só para a Ana" passariam as duas, em silêncio.
+create unique index if not exists commission_rules_alvo_key on public.commission_rules (
+  organization_id,
+  coalesce(attendant_user_id, '00000000-0000-0000-0000-000000000000'::uuid),
+  coalesce(event_type_id, '00000000-0000-0000-0000-000000000000'::uuid)
+);
+
+-- ─── a comissão gerada ───────────────────────────────────────────────────────
+create table if not exists public.commissions (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  sale_item_id uuid not null references public.sale_items(id) on delete cascade,
+  attendant_user_id uuid not null references auth.users(id) on delete restrict,
+
+  percent numeric(5, 2) not null,
+  amount_cents bigint not null,
+
+  status text not null default 'pending' check (status in ('pending', 'paid', 'reversed')),
+  paid_at timestamptz,
+  reversed_at timestamptz,
+
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists commissions_item_key on public.commissions (sale_item_id);
+create index if not exists commissions_org_pessoa_idx
+  on public.commissions (organization_id, attendant_user_id, status);
+
+-- ─── o livro-razão da fidelidade ─────────────────────────────────────────────
+--
+-- LEDGER, não saldo. O saldo do cliente é `sum(points)` e nunca uma coluna:
+-- guardar o saldo faria o primeiro estorno divergir em silêncio.
+create table if not exists public.loyalty_ledger (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  contact_id uuid not null references public.contacts(id) on delete cascade,
+
+  -- Assinado: ganhar é positivo, resgatar é negativo. Uma coluna de "tipo" ao
+  -- lado seria a segunda forma de dizer o mesmo sinal.
+  points integer not null,
+  reason text not null,
+
+  sale_id uuid references public.sales(id) on delete set null,
+  sale_item_id uuid references public.sale_items(id) on delete set null,
+
+  -- Idempotência do ganho: finalizar a mesma comanda duas vezes não dá ponto
+  -- em dobro. A UNIQUE parcial é a garantia, não a boa intenção de quem chama.
+  idempotency_key text,
+
+  created_by_user_id uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists loyalty_ledger_idem_key
+  on public.loyalty_ledger (organization_id, idempotency_key)
+  where idempotency_key is not null;
+create index if not exists loyalty_ledger_contato_idx
+  on public.loyalty_ledger (organization_id, contact_id, created_at desc);
+-- 0354 — a regra de comissão entra no catálogo, e para isso INATIVA em vez de
+-- sumir: o percentual já aplicado está congelado no item, então apagar perderia
+-- a resposta a "por que aquela comanda saiu com este percentual".
+alter table public.commission_rules
+  add column if not exists name text not null default 'Regra de comissão';
+
+alter table public.commission_rules
+  add column if not exists is_active boolean not null default true;
+
+comment on column public.commission_rules.is_active is
+  'Regra em vigor. Inativa em vez de apagar: o percentual já aplicado está congelado no item, e o que se perderia é a resposta a "por que aquela comanda saiu com este percentual".';
+
+create index if not exists commission_rules_org_ativas_idx
+  on public.commission_rules (organization_id, event_type_id, attendant_user_id)
+  where is_active;
+
+-- 0352 — uma comanda por agendamento. PARCIAL nas duas condições: comanda avulsa
+-- é a maioria e não se exclui de comanda de agendamento, e comanda cancelada
+-- deixa de valer (sem isto, cancelar por engano trancaria o agendamento para
+-- sempre, sem conserto pela tela).
+create unique index if not exists sales_agendamento_unico_idx
+  on public.sales (organization_id, appointment_id)
+  where appointment_id is not null and status <> 'cancelled';
+
+-- Os comentários das tabelas da comanda moram AQUI, e não no bloco do RLS do
+-- núcleo: `comment on table` no baseline recriaria as tabelas num banco onde o
+-- módulo não está instalado — que é exatamente o que a D2 proíbe.
+comment on table public.sales is
+  'A comanda. Cancela, nunca apaga. `number` é sequencial por organização e não reinicia.';
+comment on table public.loyalty_ledger is
+  'Livro-razão de fidelidade. O saldo do cliente é sum(points) — NUNCA uma coluna.';
+
+-- A FK que o caixa perdeu (`financial_entries.sale_id → sales.id`, `on delete set
+-- null`) SAIU do corpo desta função: `financial_entries` é tabela do NÚCLEO, e o
+-- molde da onda 10 (`tests/invariants/provisionadora-de-modulo.test.ts`) não deixa
+-- o corpo de uma provisionadora alterar tabela do núcleo — a regra é o inverso,
+-- "FK do módulo para o núcleo", e vale para a FK nascer na tabela do módulo
+-- (`sale_items.sale_id → sales.id` está aqui embaixo).
+--
+-- A criação dela agora é rotina própria, `fn_financeiro_ligar_caixa_a_comanda()`,
+-- definida no fim desta migration: a provisionadora CHAMA a rotina (a FK continua
+-- nascendo no provisionamento) e o topo também, já na passada do kit onde a
+-- comanda já existe. Em ambos, o `not exists` passou a olhar QUALQUER FK de
+-- `financial_entries.sale_id → sales` em vez de um nome fixo — a 0351 trazia
+-- `financeiro_sale_id_fkey` e a main traz `financial_entries_sale_id_fkey`, e
+-- conferir um nome só criaria a segunda FK (item 5 do PR #1907).
+
+  -- ── RLS das cinco tabelas, declarada por ESTA função (#1906 + D5) ──────────
+  -- A rotina 0325 (`fn_proteger_tabelas_de_organizacao`) só enxerga tabela com
+  -- RLS DESLIGADA: ligando aqui a decisão do módulo prevalece, e o `revoke` de
+  -- `anon` vem junto porque é a MESMA rotina que o faria — se ela não enxerga a
+  -- tabela, ela não faz por nós.
+  --
+  -- Cada `create policy` deste corpo ocupa DUAS linhas de propósito (issue
+  -- #1906): a conferência antiga do `update.sh` (v1.39.0 a v1.63.0) casava o
+  -- nome da policy e o `on public.` na MESMA linha e abortava a atualização
+  -- de quem tem o módulo instalado. É a quebra entre as duas linhas que tira
+  -- a regra do olhar daquela varredura sem tirar a regra da tabela.
+  --
+  -- A versão anterior usava policies `_write FOR ALL`: o papel `agent+`
+  -- aparecia em WITH CHECK, que não autoriza DELETE. Agora cada operação tem
+  -- policy própria, com USING/WITH CHECK coerentes, vínculo sale-item/comanda
+  -- na mesma organização e remoção de item limitada a comanda aberta.
+  alter table public.sales enable row level security;
+  revoke all on public.sales from anon;
+  drop policy if exists tenant_isolation_sales_all on public.sales;
+  drop policy if exists tenant_isolation_sales_read on public.sales;
+  create policy tenant_isolation_sales_read
+  on public.sales for select
+    using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
+  drop policy if exists tenant_isolation_sales_write on public.sales;
+  drop policy if exists tenant_isolation_sales_insert on public.sales;
+  create policy tenant_isolation_sales_insert
+  on public.sales for insert
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_sales_update on public.sales;
+  create policy tenant_isolation_sales_update
+  on public.sales for update
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))))
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_sales_delete on public.sales;
+  create policy tenant_isolation_sales_delete
+  on public.sales for delete
+    using (public.fn_is_platform_admin_full());
+  alter table public.sale_items enable row level security;
+  revoke all on public.sale_items from anon;
+  drop policy if exists tenant_isolation_sale_items_all on public.sale_items;
+  drop policy if exists tenant_isolation_sale_items_read on public.sale_items;
+  create policy tenant_isolation_sale_items_read
+  on public.sale_items for select
+    using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
+  drop policy if exists tenant_isolation_sale_items_write on public.sale_items;
+  drop policy if exists tenant_isolation_sale_items_insert on public.sale_items;
+  create policy tenant_isolation_sale_items_insert
+  on public.sale_items for insert
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))) and exists (select 1 from public.sales s where s.id = sale_items.sale_id and s.organization_id = sale_items.organization_id));
+  drop policy if exists tenant_isolation_sale_items_update on public.sale_items;
+  create policy tenant_isolation_sale_items_update
+  on public.sale_items for update
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))) and exists (select 1 from public.sales s where s.id = sale_items.sale_id and s.organization_id = sale_items.organization_id))
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))) and exists (select 1 from public.sales s where s.id = sale_items.sale_id and s.organization_id = sale_items.organization_id));
+  drop policy if exists tenant_isolation_sale_items_delete on public.sale_items;
+  create policy tenant_isolation_sale_items_delete
+  on public.sale_items for delete
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))) and exists (select 1 from public.sales s where s.id = sale_items.sale_id and s.organization_id = sale_items.organization_id and s.status = 'open'));
+  alter table public.commission_rules enable row level security;
+  revoke all on public.commission_rules from anon;
+  drop policy if exists tenant_isolation_commission_rules_all on public.commission_rules;
+  drop policy if exists tenant_isolation_commission_rules_read on public.commission_rules;
+  create policy tenant_isolation_commission_rules_read
+  on public.commission_rules for select
+    using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
+  drop policy if exists tenant_isolation_commission_rules_write on public.commission_rules;
+  drop policy if exists tenant_isolation_commission_rules_insert on public.commission_rules;
+  create policy tenant_isolation_commission_rules_insert
+  on public.commission_rules for insert
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_commission_rules_update on public.commission_rules;
+  create policy tenant_isolation_commission_rules_update
+  on public.commission_rules for update
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))))
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_commission_rules_delete on public.commission_rules;
+  create policy tenant_isolation_commission_rules_delete
+  on public.commission_rules for delete
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  alter table public.commissions enable row level security;
+  revoke all on public.commissions from anon;
+  drop policy if exists tenant_isolation_commissions_all on public.commissions;
+  drop policy if exists tenant_isolation_commissions_read on public.commissions;
+  create policy tenant_isolation_commissions_read
+  on public.commissions for select
+    using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
+  drop policy if exists tenant_isolation_commissions_write on public.commissions;
+  drop policy if exists tenant_isolation_commissions_insert on public.commissions;
+  create policy tenant_isolation_commissions_insert
+  on public.commissions for insert
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_commissions_update on public.commissions;
+  create policy tenant_isolation_commissions_update
+  on public.commissions for update
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))))
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_commissions_delete on public.commissions;
+  create policy tenant_isolation_commissions_delete
+  on public.commissions for delete
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  alter table public.loyalty_ledger enable row level security;
+  revoke all on public.loyalty_ledger from anon;
+  drop policy if exists tenant_isolation_loyalty_ledger_all on public.loyalty_ledger;
+  drop policy if exists tenant_isolation_loyalty_ledger_read on public.loyalty_ledger;
+  create policy tenant_isolation_loyalty_ledger_read
+  on public.loyalty_ledger for select
+    using (organization_id in (select public.fn_user_org_ids()) or public.fn_is_platform_admin());
+  drop policy if exists tenant_isolation_loyalty_ledger_write on public.loyalty_ledger;
+  drop policy if exists tenant_isolation_loyalty_ledger_insert on public.loyalty_ledger;
+  create policy tenant_isolation_loyalty_ledger_insert
+  on public.loyalty_ledger for insert
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_loyalty_ledger_update on public.loyalty_ledger;
+  create policy tenant_isolation_loyalty_ledger_update
+  on public.loyalty_ledger for update
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))))
+    with check ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+  drop policy if exists tenant_isolation_loyalty_ledger_delete on public.loyalty_ledger;
+  create policy tenant_isolation_loyalty_ledger_delete
+  on public.loyalty_ledger for delete
+    using ((public.fn_is_platform_admin_full() or (organization_id in (select public.fn_user_org_ids()) and public.fn_role_at_least(organization_id, 'agent'))));
+
+  perform public.fn_financeiro_instalar_guardas_comanda();
+
+  -- D5: a proteção na MESMA transação. Sem esta linha a tabela nasce com a anon
+  -- key podendo ler tudo — `baseline.sql:4748` dá, por
+  -- `alter default privileges`, privilégio total a `anon` no que nasce depois.
+  perform public.fn_proteger_modulo_provisionado();
+
+  -- ── A comanda alcançada por SEÇÃO, não por passo escrito na cascata ────────
+  -- `notes`, `cancel_reason` e `reverse_reason` são texto da pessoa, e a comanda
+  -- é alcançada por `contact_id`. O que a D8 (migration 0485) cobra é a SEÇÃO
+  -- declarada em `modulo_secoes_lgpd`: daí em diante a redação acontece no
+  -- gatilho `trg_lgpd_secoes_de_modulo`, nos DOIS caminhos de anonimização (a
+  -- cascata e a virada `is_anonymized` de `fn_lgpd_anonymize_contact`), e sem o
+  -- núcleo nomear `sales` — o `update sales set` fixo saiu da cascata por isto.
+  perform public.fn_financeiro_declarar_secoes_lgpd();
+
+  -- A FK do caixa, que o molde não deixa o corpo criar (núcleo alterando núcleo):
+  -- sai daqui para a rotina própria que a migration define no fim, com o mesmo
+  -- guarda de `to_regclass` e a conferência de qualquer FK já existente.
+  perform public.fn_financeiro_ligar_caixa_a_comanda();
+end
+$f$;
+revoke execute on function public.fn_financeiro_provisionar() from public, anon, authenticated;
+grant execute on function public.fn_financeiro_provisionar() to service_role;
+
+comment on function public.fn_financeiro_provisionar() is
+  'Provisiona o módulo financeiro/comanda de forma idempotente; aplica RLS por operação e protege a remoção de itens de comandas abertas.';
+
+select public.fn_financeiro_instalar_guardas_comanda();
+
+
+-- ---- proteger_historico_organizacao (migration 9024) ----
+-- manifest: Impede excluir organizações com histórico financeiro, preservando seus registros.
+
+create or replace function public.fn_guard_organization_financial_history()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $guard$
+declare
+  fonte text;
+  tem_historico boolean;
+begin
+  foreach fonte in array array['sales', 'financial_entries', 'commissions', 'loyalty_ledger']
+  loop
+    if pg_catalog.to_regclass(pg_catalog.format('public.%I', fonte)) is null then
+      continue;
+    end if;
+
+    execute pg_catalog.format(
+      'select exists (select from public.%I where organization_id = $1)', fonte
+    ) into tem_historico using old.id;
+
+    if tem_historico then
+      raise exception using
+        errcode = 'PT409',
+        message = 'organizacao_com_historico_financeiro',
+        hint = 'A organização possui histórico financeiro protegido.';
+    end if;
+  end loop;
+  return old;
+end;
+$guard$;
+
+revoke execute on function public.fn_guard_organization_financial_history()
+  from public, anon, authenticated, service_role;
+
+-- A guarda única substitui tanto V4-C quanto a proteção parcial de V4-D.
+drop trigger if exists trg_v4d_org_historico on public.organizations;
+drop function if exists public.fn_v4d_guard_org();
+
+drop trigger if exists organizations_financial_history_guard on public.organizations;
+create trigger organizations_financial_history_guard
+before delete on public.organizations
+for each row execute function public.fn_guard_organization_financial_history();
+
+
+-- ---- descarte_financeiro_auditado (migration 9025) ----
+-- manifest: Restringe o descarte financeiro à RPC autorizada e reserva sua auditoria transacional.
+
+drop policy if exists tenant_isolation_financial_entries_write on public.financial_entries;
+drop policy if exists tenant_isolation_financial_entries_insert on public.financial_entries;
+create policy tenant_isolation_financial_entries_insert on public.financial_entries
+  for insert to authenticated
+  with check (public.fn_is_platform_admin_full() or public.fn_role_at_least(organization_id, 'agent'));
+drop policy if exists tenant_isolation_financial_entries_update on public.financial_entries;
+create policy tenant_isolation_financial_entries_update on public.financial_entries
+  for update to authenticated
+  using (public.fn_is_platform_admin_full() or public.fn_role_at_least(organization_id, 'agent'))
+  with check (public.fn_is_platform_admin_full() or public.fn_role_at_least(organization_id, 'agent'));
+
+-- DELETE é exclusivamente mediado pela operação auditada para clientes.
+revoke delete, truncate on public.financial_entries from public, anon, authenticated, service_role;
+
+create index if not exists financial_entries_reversao_v4d_idx
+  on public.financial_entries (reverses_entry_id) where reverses_entry_id is not null;
+
+create or replace function public.fn_v4d_autorizar_descarte(p_org uuid)
+returns uuid language plpgsql security definer set search_path = '' as $$
+declare
+  v_ator uuid := auth.uid();
+  v_suporte jsonb;
+begin
+  -- Mesmo escopo da rota atual: a administração de plataforma por si só
+  -- não substitui o papel no tenant. O JWT autenticado é a fonte do ator.
+  if v_ator is null
+     or not coalesce(public.fn_role_at_least(p_org, 'agent'), false)
+     or not coalesce(public.fn_org_operante(p_org), false)
+     or not coalesce(public.fn_support_write_allowed(p_org), false) then
+    raise sqlstate '42501' using message = 'descarte_financeiro_nao_autorizado';
+  end if;
+
+  v_suporte := public.fn_support_context();
+  if v_suporte is not null and (
+       v_suporte->>'access_mode' is distinct from 'full'
+       or v_suporte->>'status' is distinct from 'active'
+       or v_suporte->>'organization_id' is distinct from p_org::text
+     ) then
+    raise sqlstate '42501' using message = 'descarte_financeiro_nao_autorizado';
+  end if;
+
+  -- mfaEmDivida separa inscrição de prova de sessão. A evidência de
+  -- dispositivo confiável só vem de fn_session_mfa_proven.
+  -- Um JWT da plataforma não comprova a organização ativa do cookie.
+  if not coalesce(public.fn_session_mfa_proven(), false)
+     or (v_suporte is null and coalesce(auth.jwt()->>'aal', 'aal1') <> 'aal2'
+         and exists (select 1 from public.platform_admins pa
+                     where pa.user_id=v_ator and pa.revoked_at is null)
+         and exists (select 1 from auth.mfa_factors f
+                     where f.user_id=v_ator and f.factor_type='totp' and f.status='verified')) then
+    raise sqlstate '42501' using message = 'descarte_financeiro_mfa_required';
+  end if;
+
+  return v_ator;
+end
+$$;
+revoke execute on function public.fn_v4d_autorizar_descarte(uuid) from public, anon, authenticated, service_role;
+
+create or replace function public.fn_v4d_guard_lancamento()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare
+  v_honorario boolean;
+begin
+  if tg_op = 'TRUNCATE' then
+    raise sqlstate 'PT409' using message = 'historico_financeiro_protegido';
+  end if;
+
+  if tg_op = 'UPDATE' then
+    if new.origin is distinct from old.origin
+       or new.organization_id is distinct from old.organization_id
+       or (old.status = 'paid' and new.status <> 'paid')
+       or (old.paid_at is not null and new.paid_at is distinct from old.paid_at)
+       or (old.reverses_entry_id is not null and new.reverses_entry_id is distinct from old.reverses_entry_id)
+       or (old.origin = 'manual' and (
+            (old.sale_id is not null and new.sale_id is distinct from old.sale_id)
+            or (old.recurring_entry_id is not null and new.recurring_entry_id is distinct from old.recurring_entry_id)
+          )) then
+      raise sqlstate 'PT409' using message = 'procedencia_financeira_protegida';
+    end if;
+    return new;
+  end if;
+
+  if old.status <> 'pending' or old.paid_at is not null or old.origin <> 'manual'
+     or old.sale_id is not null or old.reverses_entry_id is not null or old.recurring_entry_id is not null
+     or exists (select 1 from public.financial_entries f where f.reverses_entry_id = old.id) then
+    raise sqlstate 'PT409' using message = 'historico_financeiro_protegido';
+  end if;
+
+  -- Honorários é modular. A consulta usa vínculo por ID, mesmo em dados legados
+  -- inconsistentes, e nunca depende de uma tabela instalada no QA.
+  if pg_catalog.to_regclass('public.honorarios_parcelas') is not null then
+    execute 'select exists (select 1 from public.honorarios_parcelas where financial_entry_id = $1)'
+      into v_honorario using old.id;
+    if v_honorario then
+      raise sqlstate 'PT409' using message = 'historico_financeiro_protegido';
+    end if;
+  end if;
+  perform public.fn_v4d_autorizar_descarte(old.organization_id);
+  return old;
+end
+$$;
+revoke execute on function public.fn_v4d_guard_lancamento() from public, anon, authenticated, service_role;
+
+drop trigger if exists trg_v4d_lancamento_protegido on public.financial_entries;
+create trigger trg_v4d_lancamento_protegido
+  before update or delete on public.financial_entries
+  for each row execute function public.fn_v4d_guard_lancamento();
+drop trigger if exists trg_v4d_lancamento_truncate on public.financial_entries;
+create trigger trg_v4d_lancamento_truncate
+  before truncate on public.financial_entries
+  for each statement execute function public.fn_v4d_guard_lancamento();
+
+create or replace function public.fn_v4d_auditar_descarte()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  insert into public.api_audit_log
+    (organization_id, actor_user_id, acting_as_platform_admin, action, resource_type, resource_id, request_id, bypassed_rls, metadata)
+  values (old.organization_id, auth.uid(), public.fn_support_context() is not null, 'financeiro.lancamento_removido',
+     'financial_entry', old.id,
+    case when pg_catalog.current_setting('jarvis.v4e_request_id', true)
+                   ~ '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'
+      then pg_catalog.current_setting('jarvis.v4e_request_id', true) end, true, pg_catalog.jsonb_build_object('amount_cents', old.amount_cents));
+  return old;
+end
+$$;
+revoke execute on function public.fn_v4d_auditar_descarte() from public, anon, authenticated, service_role;
+drop trigger if exists trg_v4d_lancamento_auditar on public.financial_entries;
+create trigger trg_v4d_lancamento_auditar after delete on public.financial_entries
+  for each row execute function public.fn_v4d_auditar_descarte();
+
+drop policy if exists audit_log_descarte_financeiro_reservado on public.api_audit_log;
+create policy audit_log_descarte_financeiro_reservado
+  on public.api_audit_log
+  as restrictive
+  for insert to anon, authenticated
+  with check (action is distinct from 'financeiro.lancamento_removido');
+
+create or replace function public.fn_v4e_descartar_lancamento(p_org uuid, p_lancamento uuid, p_request_id uuid)
+returns uuid language plpgsql security definer set search_path = '' as $$
+declare
+  v_anterior text := pg_catalog.current_setting('jarvis.v4e_request_id', true);
+begin
+  perform public.fn_v4d_autorizar_descarte(p_org);
+
+  perform 1
+    from public.financial_entries f
+   where f.id = p_lancamento and f.organization_id = p_org
+   for update;
+  if not found then
+    raise sqlstate 'PT404' using message = 'lancamento_nao_encontrado';
+  end if;
+
+  -- O trigger revalida o OLD sob o bloqueio. O lock também serializa a inserção
+  -- de referências por FK com o descarte.
+  perform pg_catalog.set_config('jarvis.v4e_request_id', coalesce(p_request_id::text, ''), true);
+  delete from public.financial_entries where id = p_lancamento and organization_id = p_org;
+  if not found then
+    raise sqlstate 'PT404' using message = 'lancamento_nao_encontrado';
+  end if;
+  perform pg_catalog.set_config('jarvis.v4e_request_id', coalesce(v_anterior, ''), true);
+  return p_lancamento;
+end
+$$;
+revoke execute on function public.fn_v4e_descartar_lancamento(uuid, uuid, uuid)
+  from public, anon, authenticated, service_role;
+
+-- A interface anterior sai da superfície RPC sem remover dependências implicitamente.
+drop function if exists public.fn_v4d_descartar_lancamento(uuid, uuid);
+
+grant execute on function public.fn_v4e_descartar_lancamento(uuid, uuid, uuid) to authenticated;

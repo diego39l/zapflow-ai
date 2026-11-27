@@ -12,6 +12,9 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import type { ApiErrorCode } from "@/lib/api/errors";
 
+/** Cabeçalho interno sobrescrito pelo proxy para o descarte financeiro. */
+export const FINANCIAL_DELETE_REQUEST_ID_HEADER = "x-financial-delete-request-id";
+
 // -----------------------------------------------------------------------------
 // Tipos públicos
 // -----------------------------------------------------------------------------

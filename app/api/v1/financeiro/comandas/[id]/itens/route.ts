@@ -55,6 +55,7 @@ export async function POST(req: NextRequest, ctx: Ctx): Promise<Response> {
   const { data: comanda } = await supabase
     .from("sales")
     .select("id, status, number")
+    .eq("organization_id", org)
     .eq("id", id)
     .maybeSingle();
   if (!comanda) return fail("not_found", "Comanda não encontrada.", 404, { requestId });

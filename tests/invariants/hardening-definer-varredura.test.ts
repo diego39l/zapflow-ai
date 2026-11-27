@@ -67,6 +67,13 @@ const ANON_PERMITIDO: readonly Excecao[] = [];
  */
 const AUTHENTICATED_PERMITIDO: readonly Excecao[] = [
   {
+    fn: "fn_v4e_descartar_lancamento(uuid,uuid,uuid)",
+    razao:
+      "DELETE app/api/v1/financeiro/lancamentos/[id]/route.ts usa o cliente de sessão. " +
+      "A definer é a única interface para o descarte após revogar DELETE direto. " +
+      "Valida auth.uid(), tenant, papel, suporte e MFA, e grava a auditoria na transação.",
+  },
+  {
     fn: "encrypt_cpf(text)",
     razao:
       "POST/PATCH app/api/v1/contacts/route.ts e app/api/v1/contacts/[id]/route.ts, " +

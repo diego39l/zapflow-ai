@@ -71,6 +71,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     .select(
       "id, title, contact_id, event_type_id, status, calendar_event_types(name, default_price_cents)",
     )
+    .eq("organization_id", org)
     .in("id", lido.data.appointment_ids)
     .in("status", ["confirmed", "completed"]);
 
